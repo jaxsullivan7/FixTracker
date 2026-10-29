@@ -26,7 +26,7 @@ Tres decisiones guían el diseño:
 | **Historial** | Búsqueda por servicio, taller o vehículo, filtros por tipo y agrupación mensual con totales. |
 | **Nuevo servicio** | Tipo, concepto, fecha, kilometraje, coste, taller y notas. Al guardar aceite, ITV o seguro se reprograman automáticamente sus avisos. |
 | **Recordatorios** | Agrupados por vencidos, próximos 30 días, más adelante y completados. Se pueden marcar como hechos y crear nuevos. |
-| **Ajustes** | Nombre, tema claro/oscuro/sistema, moneda (EUR/USD/GBP), exportación JSON, datos de ejemplo y privacidad. |
+| **Ajustes** | Nombre, tema claro/oscuro/sistema, moneda (EUR/USD/GBP), exportación JSON, reinicio de datos de ejemplo, borrado total y privacidad. |
 
 Todo se guarda en el dispositivo en `fixtracker.json`; no hay red ni cuentas. El primer arranque carga un garaje de ejemplo (Alfa Romeo Giulietta + Vespa Primavera) con servicios y avisos fechados respecto a hoy para poder evaluar la interfaz con contenido real.
 

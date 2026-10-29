@@ -164,6 +164,7 @@ fun FixTrackerApp(
                     onUpdateSettings = { repository.updateSettings(it) },
                     onUpdateName = { repository.updateOwnerName(it) },
                     onReset = { repository.resetDemo() },
+                    onClearAll = { repository.clearAll() },
                     exportJson = { repository.exportJson() },
                 )
 

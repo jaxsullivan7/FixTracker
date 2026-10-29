@@ -85,6 +85,11 @@ object SeedData {
                 cost = 45.00, shop = "Neumáticos Sur",
             ),
             ServiceRecord(
+                id = "rec-alfa-10", vehicleId = alfa.id, type = ServiceType.REPARACION,
+                title = "Escobillas limpiaparabrisas", date = daysAgo(6), km = 96_100,
+                cost = 38.90, shop = "Taller Rivas", notes = "Juego delantero Bosch Aerotwin.",
+            ),
+            ServiceRecord(
                 id = "rec-vespa-1", vehicleId = vespa.id, type = ServiceType.ACEITE,
                 title = "Cambio de aceite", date = daysAgo(75), km = 11_900,
                 cost = 55.00, shop = "Moto Rivas", notes = "Aceite 10W-40 y filtro.",

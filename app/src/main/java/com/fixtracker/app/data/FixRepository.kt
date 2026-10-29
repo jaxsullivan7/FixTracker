@@ -176,6 +176,16 @@ class FixRepository(context: Context) {
         persist(next)
     }
 
+    fun clearAll() {
+        mutate { current ->
+            AppState(
+                ownerName = current.ownerName,
+                activeVehicleId = "",
+                settings = current.settings,
+            )
+        }
+    }
+
     fun exportJson(): String = _state.value.toJson().toString(2)
 
     private fun formatInterval(km: Int): String = String.format("%,d", km).replace(',', '.')

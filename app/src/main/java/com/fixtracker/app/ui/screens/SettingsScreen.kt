@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.DarkMode
+import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Payments
@@ -63,6 +64,7 @@ fun SettingsScreen(
     onUpdateSettings: (Settings) -> Unit,
     onUpdateName: (String) -> Unit,
     onReset: () -> Unit,
+    onClearAll: () -> Unit,
     exportJson: () -> String,
 ) {
     val context = LocalContext.current
@@ -70,6 +72,7 @@ fun SettingsScreen(
     var themeDialog by remember { mutableStateOf(false) }
     var currencyDialog by remember { mutableStateOf(false) }
     var confirmReset by remember { mutableStateOf(false) }
+    var confirmClear by remember { mutableStateOf(false) }
     var aboutDialog by remember { mutableStateOf(false) }
 
     LazyColumn(
@@ -192,10 +195,17 @@ fun SettingsScreen(
             Spacer(Modifier.height(10.dp))
             FixCard(modifier = Modifier.fillMaxWidth()) {
                 SettingsRow(
+                    icon = Icons.Outlined.DeleteOutline,
+                    title = "Empezar de cero",
+                    value = "",
+                    tint = FixTheme.palette.danger,
+                    onClick = { confirmClear = true },
+                )
+                Hairline(Modifier.padding(horizontal = 16.dp))
+                SettingsRow(
                     icon = Icons.Outlined.RestartAlt,
                     title = "Restablecer datos de ejemplo",
                     value = "",
-                    tint = FixTheme.palette.danger,
                     onClick = { confirmReset = true },
                 )
                 Hairline(Modifier.padding(horizontal = 16.dp))
@@ -301,6 +311,19 @@ fun SettingsScreen(
                 onUpdateSettings(state.settings.copy(currency = it))
                 currencyDialog = false
             },
+        )
+    }
+
+    if (confirmClear) {
+        ConfirmDialog(
+            title = "¿Empezar de cero?",
+            message = "Se borrarán todos los vehículos, servicios y avisos de este dispositivo. Podrás añadir tu propio vehículo desde el inicio.",
+            confirmLabel = "Borrar todo",
+            onConfirm = {
+                confirmClear = false
+                onClearAll()
+            },
+            onDismiss = { confirmClear = false },
         )
     }
 
