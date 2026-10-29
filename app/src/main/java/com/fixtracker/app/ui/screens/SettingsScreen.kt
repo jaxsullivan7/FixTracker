@@ -20,8 +20,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.DarkMode
-import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.Download
+import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Payments
 import androidx.compose.material.icons.outlined.RestartAlt
 import androidx.compose.material3.AlertDialog
@@ -200,8 +200,8 @@ fun SettingsScreen(
                 )
                 Hairline(Modifier.padding(horizontal = 16.dp))
                 SettingsRow(
-                    icon = Icons.Outlined.DeleteOutline,
-                    title = "Sobre la privacidad",
+                    icon = Icons.Outlined.Lock,
+                    title = "Privacidad y datos",
                     value = "",
                     onClick = { aboutDialog = true },
                 )

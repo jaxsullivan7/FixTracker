@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.FactCheck
 import androidx.compose.material.icons.outlined.Build
 import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.DeleteOutline
@@ -176,7 +177,7 @@ fun VehicleDetailScreen(
             Spacer(Modifier.height(12.dp))
             FixCard(modifier = Modifier.fillMaxWidth()) {
                 DocumentRow(
-                    icon = Icons.Outlined.FactCheck,
+                    icon = Icons.AutoMirrored.Outlined.FactCheck,
                     title = "Inspección técnica",
                     date = vehicle.itvUntil,
                     accent = FixTheme.palette.gold,

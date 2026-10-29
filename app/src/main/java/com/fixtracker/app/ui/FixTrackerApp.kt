@@ -142,6 +142,10 @@ fun FixTrackerApp(
                     onOpenReminders = { push(Screen.Reminders) },
                     onOpenHistory = { openTab(Screen.History) },
                     onOpenSettings = { openTab(Screen.Settings) },
+                    onAddVehicle = {
+                        openTab(Screen.Vehicles)
+                        push(Screen.AddVehicle)
+                    },
                 )
 
                 is Screen.Vehicles -> VehiclesScreen(

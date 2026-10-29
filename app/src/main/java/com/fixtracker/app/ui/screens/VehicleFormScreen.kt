@@ -84,16 +84,6 @@ fun VehicleFormScreen(
             ScreenHeader(
                 title = if (existing == null) "Nuevo vehículo" else "Editar vehículo",
                 onBack = onClose,
-                trailing = {
-                    IconButton(onClick = onClose) {
-                        Icon(
-                            Icons.Outlined.Close,
-                            contentDescription = "Cerrar",
-                            tint = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.size(20.dp),
-                        )
-                    }
-                },
             )
             Spacer(Modifier.height(16.dp))
             Text(

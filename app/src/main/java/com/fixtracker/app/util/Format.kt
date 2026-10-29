@@ -9,7 +9,7 @@ import java.time.temporal.ChronoUnit
 import java.util.Currency
 import java.util.Locale
 
-private val spanish = Locale("es", "ES")
+private val spanish = Locale.forLanguageTag("es-ES")
 private val dayMonth = DateTimeFormatter.ofPattern("d MMM", spanish)
 private val dayMonthYear = DateTimeFormatter.ofPattern("d MMM yyyy", spanish)
 private val monthYear = DateTimeFormatter.ofPattern("MMMM yyyy", spanish)

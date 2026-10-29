@@ -59,6 +59,7 @@ import com.fixtracker.app.ui.components.EmptyState
 import com.fixtracker.app.ui.components.FixCard
 import com.fixtracker.app.ui.components.Hairline
 import com.fixtracker.app.ui.components.Label
+import com.fixtracker.app.ui.components.PrimaryButton
 import com.fixtracker.app.ui.components.SectionHeader
 import com.fixtracker.app.ui.components.SpendBars
 import com.fixtracker.app.ui.components.StatusChip
@@ -89,6 +90,7 @@ fun HomeScreen(
     onOpenReminders: () -> Unit,
     onOpenHistory: () -> Unit,
     onOpenSettings: () -> Unit,
+    onAddVehicle: () -> Unit,
 ) {
     val vehicle = state.activeVehicle
     val reminders = vehicle?.let { v ->
@@ -231,11 +233,17 @@ fun HomeScreen(
             }
         } else {
             item {
-                Spacer(Modifier.height(40.dp))
+                Spacer(Modifier.height(32.dp))
                 EmptyState(
                     icon = Icons.Outlined.Add,
                     title = "Tu garaje está vacío",
                     message = "Añade un vehículo para empezar a registrar su mantenimiento.",
+                )
+                PrimaryButton(
+                    text = "Añadir vehículo",
+                    icon = Icons.Outlined.Add,
+                    onClick = onAddVehicle,
+                    modifier = Modifier.padding(horizontal = 40.dp),
                 )
             }
         }

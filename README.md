@@ -77,6 +77,18 @@ APK resultante:
 app/build/outputs/apk/debug/app-debug.apk
 ```
 
+Copia lista para instalar:
+
+```
+dist/FixTracker-0.1.0-boceto.apk
+```
+
+### Instalar en el móvil
+
+1. Copia `dist/FixTracker-0.1.0-boceto.apk` al teléfono (cable, Drive, Telegram…).
+2. Ábrelo desde el gestor de archivos y acepta «Instalar apps desconocidas» para esa app.
+3. La APK está firmada en modo debug: sirve para revisión, no para publicar en Play Store.
+
 Instalar en un dispositivo conectado:
 
 ```bash

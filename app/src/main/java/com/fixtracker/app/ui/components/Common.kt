@@ -22,6 +22,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.FactCheck
 import androidx.compose.material.icons.outlined.Air
 import androidx.compose.material.icons.outlined.Album
 import androidx.compose.material.icons.outlined.ArrowBack
@@ -96,7 +98,7 @@ fun serviceIcon(type: ServiceType): ImageVector = when (type) {
     ServiceType.FRENOS -> Icons.Outlined.Album
     ServiceType.NEUMATICOS -> Icons.Outlined.TireRepair
     ServiceType.REVISION -> Icons.Outlined.Build
-    ServiceType.ITV -> Icons.Outlined.FactCheck
+    ServiceType.ITV -> Icons.AutoMirrored.Outlined.FactCheck
     ServiceType.SEGURO -> Icons.Outlined.Shield
     ServiceType.REPARACION -> Icons.Outlined.Handyman
     ServiceType.OTRO -> Icons.Outlined.MoreHoriz
@@ -172,9 +174,9 @@ fun ScreenHeader(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (onBack != null) {
-            CircleIconButton(icon = Icons.Outlined.ArrowBack, onClick = onBack)
+            CircleIconButton(icon = Icons.AutoMirrored.Outlined.ArrowBack, onClick = onBack)
+            Spacer(Modifier.width(12.dp))
         }
-        Spacer(Modifier.width(12.dp))
         Text(
             text = title,
             style = MaterialTheme.typography.titleLarge,

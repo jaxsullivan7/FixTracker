@@ -88,16 +88,6 @@ fun RecordFormScreen(
             ScreenHeader(
                 title = "Nuevo servicio",
                 onBack = onClose,
-                trailing = {
-                    androidx.compose.material3.IconButton(onClick = onClose) {
-                        Icon(
-                            Icons.Outlined.Close,
-                            contentDescription = "Cerrar",
-                            tint = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.size(20.dp),
-                        )
-                    }
-                },
             )
         }
 
