@@ -1,0 +1,557 @@
+{
+  "project": "FIX",
+  "source": "docs/BACKLOG.md",
+  "version": "0.1.0",
+  "epics": [
+    {
+      "id": "FIX-E1",
+      "summary": "Garaje y vehículos",
+      "goal": "",
+      "state": "",
+      "stories": [
+        {
+          "id": "FIX-101",
+          "summary": "Alta de vehículo",
+          "criteria": "Formulario con marca, modelo, matrícula, año, km, combustible, tipo, color, ITV y seguro. Validación de marca/modelo. El vehículo aparece en el garaje y se marca como activo.",
+          "priority": "P0",
+          "points": 3,
+          "status": "done",
+          "jiraKey": "FIX-9",
+          "jiraStatus": "Done"
+        },
+        {
+          "id": "FIX-102",
+          "summary": "Cambiar vehículo activo",
+          "criteria": "Desde la ficha, un toque lo convierte en activo; Inicio e insignias se actualizan al instante.",
+          "priority": "P0",
+          "points": 1,
+          "status": "done",
+          "jiraKey": "FIX-10",
+          "jiraStatus": "Done"
+        },
+        {
+          "id": "FIX-103",
+          "summary": "Editar vehículo",
+          "criteria": "Se conservan servicios, avisos e identificador. Cambios visibles al volver.",
+          "priority": "P0",
+          "points": 2,
+          "status": "done",
+          "jiraKey": "FIX-11",
+          "jiraStatus": "Done"
+        },
+        {
+          "id": "FIX-104",
+          "summary": "Eliminar vehículo",
+          "criteria": "Confirmación explícita; se borran sus servicios y avisos y se activa otro vehículo si existe.",
+          "priority": "P0",
+          "points": 3,
+          "status": "done",
+          "jiraKey": "FIX-12",
+          "jiraStatus": "Done"
+        },
+        {
+          "id": "FIX-105",
+          "summary": "Foto o ilustración del vehículo",
+          "criteria": "Imagen opcional con recorte; sustituye el monograma en garaje y ficha.",
+          "priority": "P2",
+          "points": 5,
+          "status": "todo",
+          "jiraKey": "FIX-13",
+          "jiraStatus": "To Do"
+        },
+        {
+          "id": "FIX-106",
+          "summary": "Historial de kilometraje",
+          "criteria": "Gráfica de evolución y registro rápido de km con fecha.",
+          "priority": "P1",
+          "points": 5,
+          "status": "todo",
+          "jiraKey": "FIX-14",
+          "jiraStatus": "To Do"
+        }
+      ],
+      "jiraKey": "FIX-1"
+    },
+    {
+      "id": "FIX-E2",
+      "summary": "Mantenimiento e historial",
+      "goal": "",
+      "state": "",
+      "stories": [
+        {
+          "id": "FIX-201",
+          "summary": "Registrar servicio",
+          "criteria": "Tipo, concepto, fecha, km, coste, taller y notas. El registro aparece en historial e Inicio; el km del vehículo sube si procede.",
+          "priority": "P0",
+          "points": 5,
+          "status": "done",
+          "jiraKey": "FIX-15",
+          "jiraStatus": "Done"
+        },
+        {
+          "id": "FIX-202",
+          "summary": "Reprogramación automática",
+          "criteria": "Al guardar aceite/ITV/seguro se actualiza la próxima fecha (y km de aceite) y se reemplaza el aviso correspondiente.",
+          "priority": "P0",
+          "points": 3,
+          "status": "done",
+          "jiraKey": "FIX-16",
+          "jiraStatus": "Done"
+        },
+        {
+          "id": "FIX-203",
+          "summary": "Historial filtrable",
+          "criteria": "Búsqueda por texto + filtro por tipo + agrupación mensual con total.",
+          "priority": "P0",
+          "points": 3,
+          "status": "done",
+          "jiraKey": "FIX-17",
+          "jiraStatus": "Done"
+        },
+        {
+          "id": "FIX-204",
+          "summary": "Detalle de servicio",
+          "criteria": "Muestra todos los campos, vehículo y coste; permite eliminar con confirmación.",
+          "priority": "P0",
+          "points": 2,
+          "status": "done",
+          "jiraKey": "FIX-18",
+          "jiraStatus": "Done"
+        },
+        {
+          "id": "FIX-205",
+          "summary": "Editar servicio",
+          "criteria": "Reutiliza el formulario; si cambia el tipo o la fecha, recalcula avisos.",
+          "priority": "P1",
+          "points": 5,
+          "status": "todo",
+          "jiraKey": "FIX-19",
+          "jiraStatus": "To Do"
+        },
+        {
+          "id": "FIX-206",
+          "summary": "Plantillas de mantenimiento",
+          "criteria": "Paquetes predefinidos por tipo de vehículo (aceite, filtros, correa…).",
+          "priority": "P1",
+          "points": 8,
+          "status": "todo",
+          "jiraKey": "FIX-20",
+          "jiraStatus": "To Do"
+        },
+        {
+          "id": "FIX-207",
+          "summary": "Adjuntar factura",
+          "criteria": "Foto o PDF asociado al servicio, guardado local y visible en el detalle.",
+          "priority": "P1",
+          "points": 8,
+          "status": "todo",
+          "jiraKey": "FIX-21",
+          "jiraStatus": "To Do"
+        },
+        {
+          "id": "FIX-208",
+          "summary": "Exportar historial a CSV",
+          "criteria": "Descarga con fecha, tipo, km, coste y taller.",
+          "priority": "P2",
+          "points": 3,
+          "status": "todo",
+          "jiraKey": "FIX-22",
+          "jiraStatus": "To Do"
+        }
+      ],
+      "jiraKey": "FIX-2"
+    },
+    {
+      "id": "FIX-E3",
+      "summary": "Avisos y notificaciones",
+      "goal": "",
+      "state": "",
+      "stories": [
+        {
+          "id": "FIX-301",
+          "summary": "Panel de avisos",
+          "criteria": "Agrupados en vencidos, próximos 30 días, más adelante y completados.",
+          "priority": "P0",
+          "points": 3,
+          "status": "done",
+          "jiraKey": "FIX-23",
+          "jiraStatus": "Done"
+        },
+        {
+          "id": "FIX-302",
+          "summary": "Completar y crear avisos",
+          "criteria": "Marcar/desmarcar como hecho y crear aviso con título, vehículo y fecha.",
+          "priority": "P0",
+          "points": 2,
+          "status": "done",
+          "jiraKey": "FIX-24",
+          "jiraStatus": "Done"
+        },
+        {
+          "id": "FIX-303",
+          "summary": "Notificaciones locales",
+          "criteria": "Aviso a 30/7/1 días y el día del vencimiento; permiso en Android 13+; canal y ajustes.",
+          "priority": "P1",
+          "points": 8,
+          "status": "todo",
+          "jiraKey": "FIX-25",
+          "jiraStatus": "To Do"
+        },
+        {
+          "id": "FIX-304",
+          "summary": "Avisos por kilometraje",
+          "criteria": "Estimación de km/mes a partir de registros para avisar «te quedan ~500 km».",
+          "priority": "P1",
+          "points": 5,
+          "status": "partial",
+          "jiraKey": "FIX-26",
+          "jiraStatus": "In Progress"
+        },
+        {
+          "id": "FIX-305",
+          "summary": "Posponer aviso",
+          "criteria": "«Recordar más tarde» 1 semana/1 mes sin marcarlo como hecho.",
+          "priority": "P2",
+          "points": 2,
+          "status": "todo",
+          "jiraKey": "FIX-27",
+          "jiraStatus": "To Do"
+        },
+        {
+          "id": "FIX-306",
+          "summary": "Resumen semanal",
+          "criteria": "Notificación opcional los lunes con el estado del garaje.",
+          "priority": "P2",
+          "points": 3,
+          "status": "todo",
+          "jiraKey": "FIX-28",
+          "jiraStatus": "To Do"
+        }
+      ],
+      "jiraKey": "FIX-3"
+    },
+    {
+      "id": "FIX-E4",
+      "summary": "Gastos y analítica",
+      "goal": "",
+      "state": "",
+      "stories": [
+        {
+          "id": "FIX-401",
+          "summary": "Gasto mensual",
+          "criteria": "Total del mes y barras de los últimos 6 meses por vehículo.",
+          "priority": "P0",
+          "points": 3,
+          "status": "done",
+          "jiraKey": "FIX-29",
+          "jiraStatus": "Done"
+        },
+        {
+          "id": "FIX-402",
+          "summary": "Gasto total y anual",
+          "criteria": "En ficha y ajustes, sin duplicar servicios.",
+          "priority": "P0",
+          "points": 1,
+          "status": "done",
+          "jiraKey": "FIX-30",
+          "jiraStatus": "Done"
+        },
+        {
+          "id": "FIX-403",
+          "summary": "Comparativa mensual",
+          "criteria": "Porcentaje frente al mes anterior con semántica clara (sube = cobre, baja = verde).",
+          "priority": "P0",
+          "points": 1,
+          "status": "done",
+          "jiraKey": "FIX-31",
+          "jiraStatus": "Done"
+        },
+        {
+          "id": "FIX-404",
+          "summary": "Desglose por tipo",
+          "criteria": "Donut/barras por aceite, frenos, seguro… y coste medio por km.",
+          "priority": "P1",
+          "points": 5,
+          "status": "todo",
+          "jiraKey": "FIX-32",
+          "jiraStatus": "To Do"
+        },
+        {
+          "id": "FIX-405",
+          "summary": "Presupuesto anual",
+          "criteria": "Objetivo de gasto con progreso y aviso al superarlo.",
+          "priority": "P2",
+          "points": 5,
+          "status": "todo",
+          "jiraKey": "FIX-33",
+          "jiraStatus": "To Do"
+        }
+      ],
+      "jiraKey": "FIX-4"
+    },
+    {
+      "id": "FIX-E5",
+      "summary": "Documentación y archivos",
+      "goal": "",
+      "state": "",
+      "stories": [
+        {
+          "id": "FIX-501",
+          "summary": "Vigencia de ITV y seguro",
+          "criteria": "Fechas editables y chip Vigente / Próximo / Vencido.",
+          "priority": "P0",
+          "points": 2,
+          "status": "done",
+          "jiraKey": "FIX-34",
+          "jiraStatus": "Done"
+        },
+        {
+          "id": "FIX-502",
+          "summary": "Avisos de documentación",
+          "criteria": "Generar/actualizar avisos al guardar las fechas.",
+          "priority": "P0",
+          "points": 2,
+          "status": "done",
+          "jiraKey": "FIX-35",
+          "jiraStatus": "Done"
+        },
+        {
+          "id": "FIX-503",
+          "summary": "Guardar documentos",
+          "criteria": "Adjuntar imagen/PDF de póliza e ITV con visor básico.",
+          "priority": "P2",
+          "points": 8,
+          "status": "todo",
+          "jiraKey": "FIX-36",
+          "jiraStatus": "To Do"
+        },
+        {
+          "id": "FIX-504",
+          "summary": "Compartir ficha del vehículo",
+          "criteria": "Exportar PDF con datos, historial y próximos servicios.",
+          "priority": "P2",
+          "points": 5,
+          "status": "todo",
+          "jiraKey": "FIX-37",
+          "jiraStatus": "To Do"
+        }
+      ],
+      "jiraKey": "FIX-5"
+    },
+    {
+      "id": "FIX-E6",
+      "summary": "Diseño y accesibilidad",
+      "goal": "",
+      "state": "",
+      "stories": [
+        {
+          "id": "FIX-601",
+          "summary": "Sistema de diseño",
+          "criteria": "Tokens de color, tipografía, formas y componentes reutilizables.",
+          "priority": "P0",
+          "points": 3,
+          "status": "done",
+          "jiraKey": "FIX-38",
+          "jiraStatus": "Done"
+        },
+        {
+          "id": "FIX-602",
+          "summary": "Tema claro/oscuro/sistema",
+          "criteria": "Contraste AA, iconos de barra correctos y persistencia de la preferencia.",
+          "priority": "P0",
+          "points": 3,
+          "status": "done",
+          "jiraKey": "FIX-39",
+          "jiraStatus": "Done"
+        },
+        {
+          "id": "FIX-603",
+          "summary": "Accesibilidad",
+          "criteria": "Etiquetas semánticas, targets ≥48 dp, escalado de fuente sin cortes, TalkBack revisado.",
+          "priority": "P1",
+          "points": 5,
+          "status": "partial",
+          "jiraKey": "FIX-40",
+          "jiraStatus": "In Progress"
+        },
+        {
+          "id": "FIX-604",
+          "summary": "Onboarding",
+          "criteria": "Tres pasos: qué hace, añade vehículo, permite avisos. Solo primer arranque.",
+          "priority": "P1",
+          "points": 3,
+          "status": "todo",
+          "jiraKey": "FIX-41",
+          "jiraStatus": "To Do"
+        },
+        {
+          "id": "FIX-605",
+          "summary": "Estados vacíos y errores",
+          "criteria": "Copy claro y acción siguiente en cada pantalla.",
+          "priority": "P1",
+          "points": 2,
+          "status": "done",
+          "jiraKey": "FIX-42",
+          "jiraStatus": "Done"
+        },
+        {
+          "id": "FIX-606",
+          "summary": "Animaciones",
+          "criteria": "Transiciones de pantalla y microinteracciones respetando «reducir movimiento».",
+          "priority": "P2",
+          "points": 3,
+          "status": "partial",
+          "jiraKey": "FIX-43",
+          "jiraStatus": "In Progress"
+        }
+      ],
+      "jiraKey": "FIX-6"
+    },
+    {
+      "id": "FIX-E7",
+      "summary": "Datos, respaldo y sincronización",
+      "goal": "",
+      "state": "",
+      "stories": [
+        {
+          "id": "FIX-701",
+          "summary": "Persistencia local",
+          "criteria": "Todo sobrevive al cierre y reinicio; escritura atómica.",
+          "priority": "P0",
+          "points": 3,
+          "status": "done",
+          "jiraKey": "FIX-44",
+          "jiraStatus": "Done"
+        },
+        {
+          "id": "FIX-702",
+          "summary": "Exportar JSON",
+          "criteria": "Compartir copia con esquema versionado.",
+          "priority": "P0",
+          "points": 2,
+          "status": "done",
+          "jiraKey": "FIX-45",
+          "jiraStatus": "Done"
+        },
+        {
+          "id": "FIX-703",
+          "summary": "Importar JSON",
+          "criteria": "Validación, previsualización y fusión o reemplazo.",
+          "priority": "P1",
+          "points": 5,
+          "status": "todo",
+          "jiraKey": "FIX-46",
+          "jiraStatus": "To Do"
+        },
+        {
+          "id": "FIX-704",
+          "summary": "Copia automática",
+          "criteria": "Backup diario local + exportación periódica opcional.",
+          "priority": "P1",
+          "points": 5,
+          "status": "todo",
+          "jiraKey": "FIX-47",
+          "jiraStatus": "To Do"
+        },
+        {
+          "id": "FIX-705",
+          "summary": "Sincronización multi-dispositivo",
+          "criteria": "Cuenta, resolución de conflictos y borrado seguro.",
+          "priority": "P2",
+          "points": 13,
+          "status": "todo",
+          "jiraKey": "FIX-48",
+          "jiraStatus": "To Do"
+        },
+        {
+          "id": "FIX-706",
+          "summary": "Migraciones de esquema",
+          "criteria": "Versionado y migración sin pérdida de datos.",
+          "priority": "P1",
+          "points": 3,
+          "status": "partial",
+          "jiraKey": "FIX-49",
+          "jiraStatus": "In Progress"
+        }
+      ],
+      "jiraKey": "FIX-7"
+    },
+    {
+      "id": "FIX-E8",
+      "summary": "Plataforma y publicación",
+      "goal": "",
+      "state": "",
+      "stories": [
+        {
+          "id": "FIX-801",
+          "summary": "Firma de release",
+          "criteria": "Keystore seguro, versionCode automático, APK/AAB firmados.",
+          "priority": "P1",
+          "points": 3,
+          "status": "todo",
+          "jiraKey": "FIX-50",
+          "jiraStatus": "To Do"
+        },
+        {
+          "id": "FIX-802",
+          "summary": "Tests",
+          "criteria": "Unitarios de repositorio y fechas; UI tests de flujos críticos.",
+          "priority": "P1",
+          "points": 8,
+          "status": "todo",
+          "jiraKey": "FIX-51",
+          "jiraStatus": "To Do"
+        },
+        {
+          "id": "FIX-803",
+          "summary": "Widget",
+          "criteria": "Próximo servicio y km en la pantalla de inicio.",
+          "priority": "P2",
+          "points": 5,
+          "status": "todo",
+          "jiraKey": "FIX-52",
+          "jiraStatus": "To Do"
+        },
+        {
+          "id": "FIX-804",
+          "summary": "Ficha de Play Store",
+          "criteria": "Icono, capturas, descripción, política de privacidad y clasificación.",
+          "priority": "P2",
+          "points": 5,
+          "status": "todo",
+          "jiraKey": "FIX-53",
+          "jiraStatus": "To Do"
+        },
+        {
+          "id": "FIX-805",
+          "summary": "Crash reporting y analítica",
+          "criteria": "Opt-in, sin datos personales; eventos de uso mínimos.",
+          "priority": "P2",
+          "points": 3,
+          "status": "todo",
+          "jiraKey": "FIX-54",
+          "jiraStatus": "To Do"
+        }
+      ],
+      "jiraKey": "FIX-8"
+    }
+  ],
+  "jira": {
+    "site": "https://jaxsullivan7.atlassian.net",
+    "board": "https://jaxsullivan7.atlassian.net/jira/software/projects/FIX/boards/5/backlog",
+    "summary": "https://jaxsullivan7.atlassian.net/jira/software/projects/FIX/summary",
+    "imported": "2026-10-29",
+    "counts": {
+      "epics": 8,
+      "stories": 46,
+      "tasks": 1,
+      "done": 20,
+      "inProgress": 4,
+      "toDo": 31
+    },
+    "task": {
+      "key": "FIX-55",
+      "summary": "Revisión visual del boceto 0.1.0"
+    }
+  }
+}

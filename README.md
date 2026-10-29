@@ -123,6 +123,16 @@ app/src/main/java/com/fixtracker/app/
 
 Los detalles de producto para Jira están en [`docs/BACKLOG.md`](docs/BACKLOG.md).
 
+## Jira
+
+El backlog vivo está en el proyecto **FIX**: [FixTracker en Jira](https://jaxsullivan7.atlassian.net/jira/software/projects/FIX/summary).
+
+- **8 épicas**, **46 historias** y **1 tarea de revisión** (`FIX-55`).
+- **20 historias en Done**, 4 parciales en In Progress y el resto en To Do.
+- Prioridades P0/P1/P2 y 185 puntos de historia cargados.
+- El mapeo entre el backlog local y las claves Jira está en `docs/jira-issues.json`.
+- La tarea `FIX-55` contiene el checklist de revisión del boceto y las limitaciones conocidas.
+
 ## Privacidad
 
 No se recopila ni se transmite ningún dato. La exportación es una acción manual que abre el selector de compartir del sistema con el JSON generado.

@@ -1,6 +1,6 @@
 # FixTracker · Backlog propuesto (Jira FIX)
 
-> El tablero de Jira (`FIX`) no era accesible sin iniciar sesión. Este documento propone la estructura de epics e historias para cargar en el proyecto, alineada con lo que ya existe en el primer boceto.
+> **Importado en Jira el 29/10/2026.** El backlog vivo está en el proyecto FIX: [tablero](https://jaxsullivan7.atlassian.net/jira/software/projects/FIX/boards/5/backlog). Se crearon 8 épicas, 46 historias y la tarea de revisión `FIX-55`. Este documento sigue siendo la fuente editable; `docs/jira-issues.json` guarda el mapeo de claves.
 >
 > Prioridades: **P0** imprescindible para el MVP, **P1** siguiente iteración, **P2** más adelante. Puntos en escala Fibonacci.
 
