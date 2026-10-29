@@ -1,0 +1,239 @@
+﻿Issue Type,Summary,Description,Priority,Epic Name,Epic Link,Story Points,Labels
+Epic,Garaje y vehículos,,,Garaje y vehículos,,,boceto v0.1
+Story,Alta de vehículo,"Formulario con marca, modelo, matrícula, año, km, combustible, tipo, color, ITV y seguro. Validación de marca/modelo. El vehículo aparece en el garaje y se marca como activo.
+
+ID: FIX-101
+Prioridad: P0
+Estado boceto: done",,,Garaje y vehículos,3,boceto v0.1 p0 fix-101
+Story,Cambiar vehículo activo,"Desde la ficha, un toque lo convierte en activo; Inicio e insignias se actualizan al instante.
+
+ID: FIX-102
+Prioridad: P0
+Estado boceto: done",,,Garaje y vehículos,1,boceto v0.1 p0 fix-102
+Story,Editar vehículo,"Se conservan servicios, avisos e identificador. Cambios visibles al volver.
+
+ID: FIX-103
+Prioridad: P0
+Estado boceto: done",,,Garaje y vehículos,2,boceto v0.1 p0 fix-103
+Story,Eliminar vehículo,"Confirmación explícita; se borran sus servicios y avisos y se activa otro vehículo si existe.
+
+ID: FIX-104
+Prioridad: P0
+Estado boceto: done",,,Garaje y vehículos,3,boceto v0.1 p0 fix-104
+Story,Foto o ilustración del vehículo,"Imagen opcional con recorte; sustituye el monograma en garaje y ficha.
+
+ID: FIX-105
+Prioridad: P2
+Estado boceto: todo",,,Garaje y vehículos,5,boceto v0.1 p2 fix-105
+Story,Historial de kilometraje,"Gráfica de evolución y registro rápido de km con fecha.
+
+ID: FIX-106
+Prioridad: P1
+Estado boceto: todo",,,Garaje y vehículos,5,boceto v0.1 p1 fix-106
+Epic,Mantenimiento e historial,,,Mantenimiento e historial,,,boceto v0.1
+Story,Registrar servicio,"Tipo, concepto, fecha, km, coste, taller y notas. El registro aparece en historial e Inicio; el km del vehículo sube si procede.
+
+ID: FIX-201
+Prioridad: P0
+Estado boceto: done",,,Mantenimiento e historial,5,boceto v0.1 p0 fix-201
+Story,Reprogramación automática,"Al guardar aceite/ITV/seguro se actualiza la próxima fecha (y km de aceite) y se reemplaza el aviso correspondiente.
+
+ID: FIX-202
+Prioridad: P0
+Estado boceto: done",,,Mantenimiento e historial,3,boceto v0.1 p0 fix-202
+Story,Historial filtrable,"Búsqueda por texto + filtro por tipo + agrupación mensual con total.
+
+ID: FIX-203
+Prioridad: P0
+Estado boceto: done",,,Mantenimiento e historial,3,boceto v0.1 p0 fix-203
+Story,Detalle de servicio,"Muestra todos los campos, vehículo y coste; permite eliminar con confirmación.
+
+ID: FIX-204
+Prioridad: P0
+Estado boceto: done",,,Mantenimiento e historial,2,boceto v0.1 p0 fix-204
+Story,Editar servicio,"Reutiliza el formulario; si cambia el tipo o la fecha, recalcula avisos.
+
+ID: FIX-205
+Prioridad: P1
+Estado boceto: todo",,,Mantenimiento e historial,5,boceto v0.1 p1 fix-205
+Story,Plantillas de mantenimiento,"Paquetes predefinidos por tipo de vehículo (aceite, filtros, correa…).
+
+ID: FIX-206
+Prioridad: P1
+Estado boceto: todo",,,Mantenimiento e historial,8,boceto v0.1 p1 fix-206
+Story,Adjuntar factura,"Foto o PDF asociado al servicio, guardado local y visible en el detalle.
+
+ID: FIX-207
+Prioridad: P1
+Estado boceto: todo",,,Mantenimiento e historial,8,boceto v0.1 p1 fix-207
+Story,Exportar historial a CSV,"Descarga con fecha, tipo, km, coste y taller.
+
+ID: FIX-208
+Prioridad: P2
+Estado boceto: todo",,,Mantenimiento e historial,3,boceto v0.1 p2 fix-208
+Epic,Avisos y notificaciones,,,Avisos y notificaciones,,,boceto v0.1
+Story,Panel de avisos,"Agrupados en vencidos, próximos 30 días, más adelante y completados.
+
+ID: FIX-301
+Prioridad: P0
+Estado boceto: done",,,Avisos y notificaciones,3,boceto v0.1 p0 fix-301
+Story,Completar y crear avisos,"Marcar/desmarcar como hecho y crear aviso con título, vehículo y fecha.
+
+ID: FIX-302
+Prioridad: P0
+Estado boceto: done",,,Avisos y notificaciones,2,boceto v0.1 p0 fix-302
+Story,Notificaciones locales,"Aviso a 30/7/1 días y el día del vencimiento; permiso en Android 13+; canal y ajustes.
+
+ID: FIX-303
+Prioridad: P1
+Estado boceto: todo",,,Avisos y notificaciones,8,boceto v0.1 p1 fix-303
+Story,Avisos por kilometraje,"Estimación de km/mes a partir de registros para avisar «te quedan ~500 km».
+
+ID: FIX-304
+Prioridad: P1
+Estado boceto: partial",,,Avisos y notificaciones,5,boceto v0.1 p1 fix-304
+Story,Posponer aviso,"«Recordar más tarde» 1 semana/1 mes sin marcarlo como hecho.
+
+ID: FIX-305
+Prioridad: P2
+Estado boceto: todo",,,Avisos y notificaciones,2,boceto v0.1 p2 fix-305
+Story,Resumen semanal,"Notificación opcional los lunes con el estado del garaje.
+
+ID: FIX-306
+Prioridad: P2
+Estado boceto: todo",,,Avisos y notificaciones,3,boceto v0.1 p2 fix-306
+Epic,Gastos y analítica,,,Gastos y analítica,,,boceto v0.1
+Story,Gasto mensual,"Total del mes y barras de los últimos 6 meses por vehículo.
+
+ID: FIX-401
+Prioridad: P0
+Estado boceto: done",,,Gastos y analítica,3,boceto v0.1 p0 fix-401
+Story,Gasto total y anual,"En ficha y ajustes, sin duplicar servicios.
+
+ID: FIX-402
+Prioridad: P0
+Estado boceto: done",,,Gastos y analítica,1,boceto v0.1 p0 fix-402
+Story,Comparativa mensual,"Porcentaje frente al mes anterior con semántica clara (sube = cobre, baja = verde).
+
+ID: FIX-403
+Prioridad: P0
+Estado boceto: done",,,Gastos y analítica,1,boceto v0.1 p0 fix-403
+Story,Desglose por tipo,"Donut/barras por aceite, frenos, seguro… y coste medio por km.
+
+ID: FIX-404
+Prioridad: P1
+Estado boceto: todo",,,Gastos y analítica,5,boceto v0.1 p1 fix-404
+Story,Presupuesto anual,"Objetivo de gasto con progreso y aviso al superarlo.
+
+ID: FIX-405
+Prioridad: P2
+Estado boceto: todo",,,Gastos y analítica,5,boceto v0.1 p2 fix-405
+Epic,Documentación y archivos,,,Documentación y archivos,,,boceto v0.1
+Story,Vigencia de ITV y seguro,"Fechas editables y chip Vigente / Próximo / Vencido.
+
+ID: FIX-501
+Prioridad: P0
+Estado boceto: done",,,Documentación y archivos,2,boceto v0.1 p0 fix-501
+Story,Avisos de documentación,"Generar/actualizar avisos al guardar las fechas.
+
+ID: FIX-502
+Prioridad: P0
+Estado boceto: done",,,Documentación y archivos,2,boceto v0.1 p0 fix-502
+Story,Guardar documentos,"Adjuntar imagen/PDF de póliza e ITV con visor básico.
+
+ID: FIX-503
+Prioridad: P2
+Estado boceto: todo",,,Documentación y archivos,8,boceto v0.1 p2 fix-503
+Story,Compartir ficha del vehículo,"Exportar PDF con datos, historial y próximos servicios.
+
+ID: FIX-504
+Prioridad: P2
+Estado boceto: todo",,,Documentación y archivos,5,boceto v0.1 p2 fix-504
+Epic,Diseño y accesibilidad,,,Diseño y accesibilidad,,,boceto v0.1
+Story,Sistema de diseño,"Tokens de color, tipografía, formas y componentes reutilizables.
+
+ID: FIX-601
+Prioridad: P0
+Estado boceto: done",,,Diseño y accesibilidad,3,boceto v0.1 p0 fix-601
+Story,Tema claro/oscuro/sistema,"Contraste AA, iconos de barra correctos y persistencia de la preferencia.
+
+ID: FIX-602
+Prioridad: P0
+Estado boceto: done",,,Diseño y accesibilidad,3,boceto v0.1 p0 fix-602
+Story,Accesibilidad,"Etiquetas semánticas, targets ≥48 dp, escalado de fuente sin cortes, TalkBack revisado.
+
+ID: FIX-603
+Prioridad: P1
+Estado boceto: partial",,,Diseño y accesibilidad,5,boceto v0.1 p1 fix-603
+Story,Onboarding,"Tres pasos: qué hace, añade vehículo, permite avisos. Solo primer arranque.
+
+ID: FIX-604
+Prioridad: P1
+Estado boceto: todo",,,Diseño y accesibilidad,3,boceto v0.1 p1 fix-604
+Story,Estados vacíos y errores,"Copy claro y acción siguiente en cada pantalla.
+
+ID: FIX-605
+Prioridad: P1
+Estado boceto: done",,,Diseño y accesibilidad,2,boceto v0.1 p1 fix-605
+Story,Animaciones,"Transiciones de pantalla y microinteracciones respetando «reducir movimiento».
+
+ID: FIX-606
+Prioridad: P2
+Estado boceto: partial",,,Diseño y accesibilidad,3,boceto v0.1 p2 fix-606
+Epic,"Datos, respaldo y sincronización",,,"Datos, respaldo y sincronización",,,boceto v0.1
+Story,Persistencia local,"Todo sobrevive al cierre y reinicio; escritura atómica.
+
+ID: FIX-701
+Prioridad: P0
+Estado boceto: done",,,"Datos, respaldo y sincronización",3,boceto v0.1 p0 fix-701
+Story,Exportar JSON,"Compartir copia con esquema versionado.
+
+ID: FIX-702
+Prioridad: P0
+Estado boceto: done",,,"Datos, respaldo y sincronización",2,boceto v0.1 p0 fix-702
+Story,Importar JSON,"Validación, previsualización y fusión o reemplazo.
+
+ID: FIX-703
+Prioridad: P1
+Estado boceto: todo",,,"Datos, respaldo y sincronización",5,boceto v0.1 p1 fix-703
+Story,Copia automática,"Backup diario local + exportación periódica opcional.
+
+ID: FIX-704
+Prioridad: P1
+Estado boceto: todo",,,"Datos, respaldo y sincronización",5,boceto v0.1 p1 fix-704
+Story,Sincronización multi-dispositivo,"Cuenta, resolución de conflictos y borrado seguro.
+
+ID: FIX-705
+Prioridad: P2
+Estado boceto: todo",,,"Datos, respaldo y sincronización",13,boceto v0.1 p2 fix-705
+Story,Migraciones de esquema,"Versionado y migración sin pérdida de datos.
+
+ID: FIX-706
+Prioridad: P1
+Estado boceto: partial",,,"Datos, respaldo y sincronización",3,boceto v0.1 p1 fix-706
+Epic,Plataforma y publicación,,,Plataforma y publicación,,,boceto v0.1
+Story,Firma de release,"Keystore seguro, versionCode automático, APK/AAB firmados.
+
+ID: FIX-801
+Prioridad: P1
+Estado boceto: todo",,,Plataforma y publicación,3,boceto v0.1 p1 fix-801
+Story,Tests,"Unitarios de repositorio y fechas; UI tests de flujos críticos.
+
+ID: FIX-802
+Prioridad: P1
+Estado boceto: todo",,,Plataforma y publicación,8,boceto v0.1 p1 fix-802
+Story,Widget,"Próximo servicio y km en la pantalla de inicio.
+
+ID: FIX-803
+Prioridad: P2
+Estado boceto: todo",,,Plataforma y publicación,5,boceto v0.1 p2 fix-803
+Story,Ficha de Play Store,"Icono, capturas, descripción, política de privacidad y clasificación.
+
+ID: FIX-804
+Prioridad: P2
+Estado boceto: todo",,,Plataforma y publicación,5,boceto v0.1 p2 fix-804
+Story,Crash reporting y analítica,"Opt-in, sin datos personales; eventos de uso mínimos.
+
+ID: FIX-805
+Prioridad: P2
+Estado boceto: todo",,,Plataforma y publicación,3,boceto v0.1 p2 fix-805
