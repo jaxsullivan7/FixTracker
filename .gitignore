@@ -1,0 +1,25 @@
+# Gradle
+.gradle/
+build/
+app/build/
+local.properties
+captures/
+.externalNativeBuild/
+.cxx/
+
+# IntelliJ / Android Studio
+.idea/
+*.iml
+*.hprof
+
+# Toolchain local (no forma parte del proyecto)
+.tools/
+*.keystore
+*.jks
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Distribución local
+dist/
