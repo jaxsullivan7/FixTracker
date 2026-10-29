@@ -120,6 +120,7 @@ class FixRepository(context: Context) {
         mutate { state ->
             state.copy(
                 vehicles = state.vehicles + vehicle,
+                reminders = state.reminders.syncDocumentReminders(vehicle),
                 activeVehicleId = vehicle.id,
             )
         }
@@ -127,7 +128,10 @@ class FixRepository(context: Context) {
 
     fun updateVehicle(vehicle: Vehicle) {
         mutate { state ->
-            state.copy(vehicles = state.vehicles.map { if (it.id == vehicle.id) vehicle else it })
+            state.copy(
+                vehicles = state.vehicles.map { if (it.id == vehicle.id) vehicle else it },
+                reminders = state.reminders.syncDocumentReminders(vehicle),
+            )
         }
     }
 
@@ -193,6 +197,42 @@ class FixRepository(context: Context) {
 
 private fun List<Reminder>.upsert(reminder: Reminder): List<Reminder> =
     filterNot { it.id == reminder.id } + reminder
+
+/** Mantiene los avisos de ITV y seguro alineados con las fechas de la ficha. */
+private fun List<Reminder>.syncDocumentReminders(vehicle: Vehicle): List<Reminder> {
+    var result = this
+    val itvId = "itv-${vehicle.id}"
+    val insuranceId = "insurance-${vehicle.id}"
+
+    result = if (vehicle.itvUntil == null) {
+        result.filterNot { it.id == itvId }
+    } else {
+        result.upsert(
+            Reminder(
+                id = itvId,
+                vehicleId = vehicle.id,
+                title = "Inspección ITV",
+                type = ServiceType.ITV,
+                dueDate = vehicle.itvUntil,
+            )
+        )
+    }
+
+    result = if (vehicle.insuranceUntil == null) {
+        result.filterNot { it.id == insuranceId }
+    } else {
+        result.upsert(
+            Reminder(
+                id = insuranceId,
+                vehicleId = vehicle.id,
+                title = "Renovación de seguro",
+                type = ServiceType.SEGURO,
+                dueDate = vehicle.insuranceUntil,
+            )
+        )
+    }
+    return result
+}
 
 // ---------------------------------------------------------------- serialization
 

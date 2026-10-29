@@ -71,7 +71,7 @@ fun RecordFormScreen(
     var shop by remember { mutableStateOf("") }
     var notes by remember { mutableStateOf("") }
 
-    val canSave = vehicle != null && (km.toIntOrNull() ?: 0) > 0
+    val canSave = vehicle != null && (km.toIntOrNull() ?: -1) >= 0
 
     fun selectType(next: ServiceType) {
         if (title == type.label || title.isBlank()) {
