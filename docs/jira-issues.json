@@ -551,11 +551,11 @@
     },
     "task": {
       "key": "FIX-55",
-      "summary": "Revisión visual del boceto 0.1.0"
+      "summary": "Revisión visual del boceto 0.2.0"
     },
     "localVersion": "0.2.0",
-    "jiraSyncPending": true,
-    "note": "Estado local v0.2.0; la sesión de Jira caducó. Ver docs/JIRA_UPDATE_v0.2.md para aplicar los cambios.",
+    "jiraSyncPending": false,
+    "note": "Estados de producto v0.2 aplicados el 4/11/2026. El desglose de esfuerzo y sprints está en docs/jira-execution.json.",
     "countsNote": "Conteo de la importación inicial (v0.1.0); ver localCounts para el estado v0.2.0.",
     "localCounts": {
       "storiesMapped": 46,
@@ -563,6 +563,13 @@
       "done": 33,
       "inProgress": 4,
       "toDo": 9
+    },
+    "execution": {
+      "tasks": 54,
+      "sprints": 5,
+      "hours": 820,
+      "points": 118,
+      "activeSprint": "Sprint 5 · Revisión"
     }
   }
 }

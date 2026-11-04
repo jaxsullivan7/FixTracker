@@ -2,7 +2,7 @@
 
 > **Importado en Jira el 29/10/2026.** El backlog vivo está en el proyecto FIX: [tablero](https://jaxsullivan7.atlassian.net/jira/software/projects/FIX/boards/5/backlog). Se crearon 8 épicas, 46 historias y la tarea de revisión `FIX-55`. Este documento sigue siendo la fuente editable; `docs/jira-issues.json` guarda el mapeo de claves.
 >
-> **v0.2.0:** la app ya incluye avisos, edición, copias, fotos, combustible, plan, PDF, presupuesto, biometría y más. La actualización pendiente de Jira está preparada en [`JIRA_UPDATE_v0.2.md`](JIRA_UPDATE_v0.2.md).
+> **v0.2.0:** la app ya incluye avisos, edición, copias, fotos, combustible, plan, PDF, presupuesto, biometría y más. La actualización de Jira se aplicó el 4/11/2026; el plan de ejecución con sprints y horas está en [`jira-execution.json`](jira-execution.json) y resumido en [`JIRA_UPDATE_v0.2.md`](JIRA_UPDATE_v0.2.md).
 >
 > Prioridades: **P0** imprescindible para el MVP, **P1** siguiente iteración, **P2** más adelante. Puntos en escala Fibonacci.
 

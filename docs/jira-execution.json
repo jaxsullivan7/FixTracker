@@ -8,7 +8,9 @@
       "start": "2026-09-07",
       "end": "2026-09-18",
       "capacityHours": 250,
-      "goal": "Diseño, arquitectura, datos y primera pantalla. Carga prevista 162 h."
+      "goal": "Diseño, arquitectura, datos y primera pantalla. Carga prevista 162 h.",
+      "jiraId": 2,
+      "jiraState": "closed"
     },
     {
       "number": 2,
@@ -16,7 +18,9 @@
       "start": "2026-09-21",
       "end": "2026-10-02",
       "capacityHours": 250,
-      "goal": "Vehículos, servicios, historial y avisos. Carga prevista 188 h."
+      "goal": "Vehículos, servicios, historial y avisos. Carga prevista 188 h.",
+      "jiraId": 47,
+      "jiraState": "closed"
     },
     {
       "number": 3,
@@ -24,7 +28,9 @@
       "start": "2026-10-05",
       "end": "2026-10-16",
       "capacityHours": 250,
-      "goal": "Notificaciones, copias, fotos, edición y seguridad. Carga prevista 180 h."
+      "goal": "Notificaciones, copias, fotos, edición y seguridad. Carga prevista 180 h.",
+      "jiraId": 48,
+      "jiraState": "closed"
     },
     {
       "number": 4,
@@ -32,7 +38,9 @@
       "start": "2026-10-19",
       "end": "2026-10-30",
       "capacityHours": 250,
-      "goal": "Combustible, plan, kilometraje, documentos, PDF y gastos. Carga prevista 196 h."
+      "goal": "Combustible, plan, kilometraje, documentos, PDF y gastos. Carga prevista 196 h.",
+      "jiraId": 49,
+      "jiraState": "closed"
     },
     {
       "number": 5,
@@ -40,7 +48,9 @@
       "start": "2026-11-02",
       "end": "2026-11-13",
       "capacityHours": 250,
-      "goal": "QA, accesibilidad, revisión visual y release candidate. Carga prevista 94 h."
+      "goal": "QA, accesibilidad, revisión visual y release candidate. Carga prevista 94 h.",
+      "jiraId": 50,
+      "jiraState": "active"
     }
   ],
   "tasks": [
@@ -55,7 +65,8 @@
       "status": "Done",
       "detail": "Definir alcance del MVP, flujos, modelo de datos inicial y criterios verificables.",
       "criteria": "Flujo implementado en claro y oscuro, con estados vacío/error y sin regresiones visuales.",
-      "jiraKey": "FIX-56"
+      "jiraKey": "FIX-56",
+      "jiraSprintId": 2
     },
     {
       "id": "T02",
@@ -68,7 +79,8 @@
       "status": "Done",
       "detail": "Paleta hueso/verde/cobre, Fraunces + Manrope, radios, espaciado y tokens.",
       "criteria": "Flujo implementado en claro y oscuro, con estados vacío/error y sin regresiones visuales.",
-      "jiraKey": null
+      "jiraKey": "FIX-57",
+      "jiraSprintId": 2
     },
     {
       "id": "T03",
@@ -81,7 +93,8 @@
       "status": "Done",
       "detail": "Wordmark, icono adaptativo, icono de notificación y set de iconos.",
       "criteria": "Flujo implementado en claro y oscuro, con estados vacío/error y sin regresiones visuales.",
-      "jiraKey": null
+      "jiraKey": "FIX-58",
+      "jiraSprintId": 2
     },
     {
       "id": "T04",
@@ -94,7 +107,8 @@
       "status": "Done",
       "detail": "Estructura de paquetes, pila de pantallas, barra inferior y transiciones.",
       "criteria": "Datos persistidos, casos límite cubiertos y verificación manual o test automatizado.",
-      "jiraKey": null
+      "jiraKey": "FIX-59",
+      "jiraSprintId": 2
     },
     {
       "id": "T05",
@@ -107,7 +121,8 @@
       "status": "Done",
       "detail": "Vehículo, servicio, recordatorio y ajustes; serialización y datos de ejemplo.",
       "criteria": "Datos persistidos, casos límite cubiertos y verificación manual o test automatizado.",
-      "jiraKey": null
+      "jiraKey": "FIX-60",
+      "jiraSprintId": 2
     },
     {
       "id": "T06",
@@ -120,7 +135,8 @@
       "status": "Done",
       "detail": "StateFlow, escritura atómica, carga inicial y copia de seguridad.",
       "criteria": "Datos persistidos, casos límite cubiertos y verificación manual o test automatizado.",
-      "jiraKey": null
+      "jiraKey": "FIX-61",
+      "jiraSprintId": 2
     },
     {
       "id": "T07",
@@ -133,7 +149,8 @@
       "status": "Done",
       "detail": "Tarjetas, campos, selectores, chips, barras, diálogos y estados vacíos.",
       "criteria": "Flujo implementado en claro y oscuro, con estados vacío/error y sin regresiones visuales.",
-      "jiraKey": null
+      "jiraKey": "FIX-62",
+      "jiraSprintId": 2
     },
     {
       "id": "T08",
@@ -146,7 +163,8 @@
       "status": "Done",
       "detail": "Vehículo activo, km, próximo aceite, avisos, gasto y actividad reciente.",
       "criteria": "Flujo implementado en claro y oscuro, con estados vacío/error y sin regresiones visuales.",
-      "jiraKey": null
+      "jiraKey": "FIX-63",
+      "jiraSprintId": 2
     },
     {
       "id": "T09",
@@ -159,7 +177,8 @@
       "status": "Done",
       "detail": "Lista, tarjetas, estado activo y acceso al alta de vehículo.",
       "criteria": "Flujo implementado en claro y oscuro, con estados vacío/error y sin regresiones visuales.",
-      "jiraKey": null
+      "jiraKey": "FIX-64",
+      "jiraSprintId": 2
     },
     {
       "id": "T10",
@@ -172,7 +191,8 @@
       "status": "Done",
       "detail": "Proyecto reproducible, build debug y APK instalable.",
       "criteria": "Datos persistidos, casos límite cubiertos y verificación manual o test automatizado.",
-      "jiraKey": null
+      "jiraKey": "FIX-65",
+      "jiraSprintId": 2
     },
     {
       "id": "T11",
@@ -185,7 +205,8 @@
       "status": "Done",
       "detail": "Casos críticos, riesgos de fechas/km y criterios de regresión.",
       "criteria": "Casos ejecutados, incidencias registradas y criterio de aceptación verificado.",
-      "jiraKey": null
+      "jiraKey": "FIX-66",
+      "jiraSprintId": 2
     },
     {
       "id": "T12",
@@ -198,7 +219,8 @@
       "status": "Done",
       "detail": "Contraste, tamaños de toque y semántica básica.",
       "criteria": "Casos ejecutados, incidencias registradas y criterio de aceptación verificado.",
-      "jiraKey": null
+      "jiraKey": "FIX-67",
+      "jiraSprintId": 2
     },
     {
       "id": "T13",
@@ -211,7 +233,8 @@
       "status": "Done",
       "detail": "Formulario con marca, modelo, matrícula, año, km, combustible y fechas.",
       "criteria": "Flujo implementado en claro y oscuro, con estados vacío/error y sin regresiones visuales.",
-      "jiraKey": null
+      "jiraKey": "FIX-68",
+      "jiraSprintId": 47
     },
     {
       "id": "T14",
@@ -224,7 +247,8 @@
       "status": "Done",
       "detail": "Datos, gasto, ITV/seguro, avisos, historial y acciones de edición.",
       "criteria": "Flujo implementado en claro y oscuro, con estados vacío/error y sin regresiones visuales.",
-      "jiraKey": null
+      "jiraKey": "FIX-69",
+      "jiraSprintId": 47
     },
     {
       "id": "T15",
@@ -237,7 +261,8 @@
       "status": "Done",
       "detail": "Tipo, concepto, fecha, km, coste, taller, notas y fotos.",
       "criteria": "Flujo implementado en claro y oscuro, con estados vacío/error y sin regresiones visuales.",
-      "jiraKey": null
+      "jiraKey": "FIX-70",
+      "jiraSprintId": 47
     },
     {
       "id": "T16",
@@ -250,7 +275,8 @@
       "status": "Done",
       "detail": "Derivar próximos servicios y avisos a partir del historial.",
       "criteria": "Datos persistidos, casos límite cubiertos y verificación manual o test automatizado.",
-      "jiraKey": null
+      "jiraKey": "FIX-71",
+      "jiraSprintId": 47
     },
     {
       "id": "T17",
@@ -263,7 +289,8 @@
       "status": "Done",
       "detail": "Búsqueda, filtros por tipo y agrupación mensual con totales.",
       "criteria": "Flujo implementado en claro y oscuro, con estados vacío/error y sin regresiones visuales.",
-      "jiraKey": null
+      "jiraKey": "FIX-72",
+      "jiraSprintId": 47
     },
     {
       "id": "T18",
@@ -276,7 +303,8 @@
       "status": "Done",
       "detail": "Agrupación por urgencia, alta manual y marcar como hecho.",
       "criteria": "Flujo implementado en claro y oscuro, con estados vacío/error y sin regresiones visuales.",
-      "jiraKey": null
+      "jiraKey": "FIX-73",
+      "jiraSprintId": 47
     },
     {
       "id": "T19",
@@ -289,7 +317,8 @@
       "status": "Done",
       "detail": "Guardado tras cada cambio, copia de respaldo y recuperación.",
       "criteria": "Datos persistidos, casos límite cubiertos y verificación manual o test automatizado.",
-      "jiraKey": null
+      "jiraKey": "FIX-74",
+      "jiraSprintId": 47
     },
     {
       "id": "T20",
@@ -302,7 +331,8 @@
       "status": "Done",
       "detail": "Tema claro/oscuro/sistema, moneda, nombre y datos de ejemplo.",
       "criteria": "Flujo implementado en claro y oscuro, con estados vacío/error y sin regresiones visuales.",
-      "jiraKey": null
+      "jiraKey": "FIX-75",
+      "jiraSprintId": 47
     },
     {
       "id": "T21",
@@ -315,7 +345,8 @@
       "status": "Done",
       "detail": "Copy claro y acción siguiente en cada pantalla.",
       "criteria": "Flujo implementado en claro y oscuro, con estados vacío/error y sin regresiones visuales.",
-      "jiraKey": null
+      "jiraKey": "FIX-76",
+      "jiraSprintId": 47
     },
     {
       "id": "T22",
@@ -328,7 +359,8 @@
       "status": "Done",
       "detail": "Flujos de vehículo, servicio, historial y avisos; casos límite.",
       "criteria": "Casos ejecutados, incidencias registradas y criterio de aceptación verificado.",
-      "jiraKey": null
+      "jiraKey": "FIX-77",
+      "jiraSprintId": 47
     },
     {
       "id": "T23",
@@ -341,7 +373,8 @@
       "status": "Done",
       "detail": "Incidencias detectadas en la regresión del sprint 2.",
       "criteria": "Casos ejecutados, incidencias registradas y criterio de aceptación verificado.",
-      "jiraKey": null
+      "jiraKey": "FIX-78",
+      "jiraSprintId": 47
     },
     {
       "id": "T24",
@@ -354,7 +387,8 @@
       "status": "Done",
       "detail": "Canal, chequeo diario, resumen, urgencias y enlace a la app.",
       "criteria": "Datos persistidos, casos límite cubiertos y verificación manual o test automatizado.",
-      "jiraKey": null
+      "jiraKey": "FIX-79",
+      "jiraSprintId": 48
     },
     {
       "id": "T25",
@@ -367,7 +401,8 @@
       "status": "Done",
       "detail": "POST_NOTIFICATIONS, canal, test de aviso y ajustes del sistema.",
       "criteria": "Datos persistidos, casos límite cubiertos y verificación manual o test automatizado.",
-      "jiraKey": null
+      "jiraKey": "FIX-80",
+      "jiraSprintId": 48
     },
     {
       "id": "T26",
@@ -380,7 +415,8 @@
       "status": "Done",
       "detail": "Nombre, demo o garaje vacío, activación de avisos.",
       "criteria": "Flujo implementado en claro y oscuro, con estados vacío/error y sin regresiones visuales.",
-      "jiraKey": null
+      "jiraKey": "FIX-81",
+      "jiraSprintId": 48
     },
     {
       "id": "T27",
@@ -393,7 +429,8 @@
       "status": "Done",
       "detail": "Formulario en modo edición y snackbar para restaurar borrados.",
       "criteria": "Flujo implementado en claro y oscuro, con estados vacío/error y sin regresiones visuales.",
-      "jiraKey": null
+      "jiraKey": "FIX-82",
+      "jiraSprintId": 48
     },
     {
       "id": "T28",
@@ -406,7 +443,8 @@
       "status": "Done",
       "detail": "Picker, compresión, almacenamiento local, miniaturas y visor.",
       "criteria": "Flujo implementado en claro y oscuro, con estados vacío/error y sin regresiones visuales.",
-      "jiraKey": null
+      "jiraKey": "FIX-83",
+      "jiraSprintId": 48
     },
     {
       "id": "T29",
@@ -419,7 +457,8 @@
       "status": "Done",
       "detail": "Exportación completa con fotos, solo datos, validación e importación.",
       "criteria": "Datos persistidos, casos límite cubiertos y verificación manual o test automatizado.",
-      "jiraKey": null
+      "jiraKey": "FIX-84",
+      "jiraSprintId": 48
     },
     {
       "id": "T30",
@@ -432,7 +471,8 @@
       "status": "Done",
       "detail": "Copia antes de cada escritura y reparación desde JSON corrupto.",
       "criteria": "Datos persistidos, casos límite cubiertos y verificación manual o test automatizado.",
-      "jiraKey": null
+      "jiraKey": "FIX-85",
+      "jiraSprintId": 48
     },
     {
       "id": "T31",
@@ -445,7 +485,8 @@
       "status": "Done",
       "detail": "Aplazamiento visible y exclusión de urgencias hasta la fecha.",
       "criteria": "Flujo implementado en claro y oscuro, con estados vacío/error y sin regresiones visuales.",
-      "jiraKey": null
+      "jiraKey": "FIX-86",
+      "jiraSprintId": 48
     },
     {
       "id": "T32",
@@ -458,7 +499,8 @@
       "status": "Done",
       "detail": "BiometricPrompt, PIN del dispositivo y ajuste opcional.",
       "criteria": "Datos persistidos, casos límite cubiertos y verificación manual o test automatizado.",
-      "jiraKey": null
+      "jiraKey": "FIX-87",
+      "jiraSprintId": 48
     },
     {
       "id": "T33",
@@ -471,7 +513,8 @@
       "status": "Done",
       "detail": "Permisos, digest, restauración ZIP y desbloqueo.",
       "criteria": "Casos ejecutados, incidencias registradas y criterio de aceptación verificado.",
-      "jiraKey": null
+      "jiraKey": "FIX-88",
+      "jiraSprintId": 48
     },
     {
       "id": "T34",
@@ -484,7 +527,8 @@
       "status": "Done",
       "detail": "Selección, compresión, persistencia y recuperación de fotos.",
       "criteria": "Casos ejecutados, incidencias registradas y criterio de aceptación verificado.",
-      "jiraKey": null
+      "jiraKey": "FIX-89",
+      "jiraSprintId": 48
     },
     {
       "id": "T35",
@@ -497,7 +541,8 @@
       "status": "Done",
       "detail": "Litros, coste, odómetro, depósito lleno, L/100 y coste/km.",
       "criteria": "Datos persistidos, casos límite cubiertos y verificación manual o test automatizado.",
-      "jiraKey": null
+      "jiraKey": "FIX-90",
+      "jiraSprintId": 49
     },
     {
       "id": "T36",
@@ -510,7 +555,8 @@
       "status": "Done",
       "detail": "Consumo, precio, gasto, gráfico, listado y alta/edición.",
       "criteria": "Flujo implementado en claro y oscuro, con estados vacío/error y sin regresiones visuales.",
-      "jiraKey": null
+      "jiraKey": "FIX-91",
+      "jiraSprintId": 49
     },
     {
       "id": "T37",
@@ -523,7 +569,8 @@
       "status": "Done",
       "detail": "Aceite, filtros, frenos, neumáticos, revisión, ITV y seguro.",
       "criteria": "Datos persistidos, casos límite cubiertos y verificación manual o test automatizado.",
-      "jiraKey": null
+      "jiraKey": "FIX-92",
+      "jiraSprintId": 49
     },
     {
       "id": "T38",
@@ -536,7 +583,8 @@
       "status": "Done",
       "detail": "Progreso, vencido/próximo/al día y acceso a registrar.",
       "criteria": "Flujo implementado en claro y oscuro, con estados vacío/error y sin regresiones visuales.",
-      "jiraKey": null
+      "jiraKey": "FIX-93",
+      "jiraSprintId": 49
     },
     {
       "id": "T39",
@@ -549,7 +597,8 @@
       "status": "Done",
       "detail": "Serie de km, estimación km/mes, sparkline y aviso de 45 días.",
       "criteria": "Datos persistidos, casos límite cubiertos y verificación manual o test automatizado.",
-      "jiraKey": null
+      "jiraKey": "FIX-94",
+      "jiraSprintId": 49
     },
     {
       "id": "T40",
@@ -562,7 +611,8 @@
       "status": "Done",
       "detail": "Fecha, ficha y aviso automático del impuesto.",
       "criteria": "Flujo implementado en claro y oscuro, con estados vacío/error y sin regresiones visuales.",
-      "jiraKey": null
+      "jiraKey": "FIX-95",
+      "jiraSprintId": 49
     },
     {
       "id": "T41",
@@ -575,7 +625,8 @@
       "status": "Done",
       "detail": "Historial, plan, documentos, combustible y gasto en PDF.",
       "criteria": "Datos persistidos, casos límite cubiertos y verificación manual o test automatizado.",
-      "jiraKey": null
+      "jiraKey": "FIX-96",
+      "jiraSprintId": 49
     },
     {
       "id": "T42",
@@ -588,7 +639,8 @@
       "status": "Done",
       "detail": "Categorías, total anual, presupuesto y progreso.",
       "criteria": "Flujo implementado en claro y oscuro, con estados vacío/error y sin regresiones visuales.",
-      "jiraKey": null
+      "jiraKey": "FIX-97",
+      "jiraSprintId": 49
     },
     {
       "id": "T43",
@@ -601,7 +653,8 @@
       "status": "Done",
       "detail": "Servicios y repostajes con cabecera, BOM y escapado.",
       "criteria": "Datos persistidos, casos límite cubiertos y verificación manual o test automatizado.",
-      "jiraKey": null
+      "jiraKey": "FIX-98",
+      "jiraSprintId": 49
     },
     {
       "id": "T44",
@@ -614,7 +667,8 @@
       "status": "Done",
       "detail": "Consumo, coste/km, plan, PDF y CSV.",
       "criteria": "Casos ejecutados, incidencias registradas y criterio de aceptación verificado.",
-      "jiraKey": null
+      "jiraKey": "FIX-99",
+      "jiraSprintId": 49
     },
     {
       "id": "T45",
@@ -627,7 +681,8 @@
       "status": "Done",
       "detail": "Regresión y ajustes tras QA del sprint 4.",
       "criteria": "Casos ejecutados, incidencias registradas y criterio de aceptación verificado.",
-      "jiraKey": null
+      "jiraKey": "FIX-100",
+      "jiraSprintId": 49
     },
     {
       "id": "T46",
@@ -640,7 +695,8 @@
       "status": "Done",
       "detail": "Botón central, servicio/repostaje/recordatorio/vehículo y switcher.",
       "criteria": "Flujo implementado en claro y oscuro, con estados vacío/error y sin regresiones visuales.",
-      "jiraKey": null
+      "jiraKey": "FIX-101",
+      "jiraSprintId": 50
     },
     {
       "id": "T47",
@@ -653,7 +709,8 @@
       "status": "Done",
       "detail": "Estado Al día/Próximo/Vencido y banner de cuentakilómetros.",
       "criteria": "Flujo implementado en claro y oscuro, con estados vacío/error y sin regresiones visuales.",
-      "jiraKey": null
+      "jiraKey": "FIX-102",
+      "jiraSprintId": 50
     },
     {
       "id": "T48",
@@ -666,7 +723,8 @@
       "status": "Done",
       "detail": "Lint, tests de insights/formatos, workflow de GitHub Actions.",
       "criteria": "Datos persistidos, casos límite cubiertos y verificación manual o test automatizado.",
-      "jiraKey": null
+      "jiraKey": "FIX-103",
+      "jiraSprintId": 50
     },
     {
       "id": "T49",
@@ -679,7 +737,8 @@
       "status": "Done",
       "detail": "Instalación, arquitectura, copias y notas de privacidad.",
       "criteria": "Datos persistidos, casos límite cubiertos y verificación manual o test automatizado.",
-      "jiraKey": null
+      "jiraKey": "FIX-104",
+      "jiraSprintId": 50
     },
     {
       "id": "T50",
@@ -692,7 +751,8 @@
       "status": "To Do",
       "detail": "Onboarding, avisos, fotos, copias, biometría y flujos completos.",
       "criteria": "Casos ejecutados, incidencias registradas y criterio de aceptación verificado.",
-      "jiraKey": null
+      "jiraKey": "FIX-105",
+      "jiraSprintId": 50
     },
     {
       "id": "T51",
@@ -705,7 +765,8 @@
       "status": "In Progress",
       "detail": "Auditoría y correcciones de semántica, escalado y contraste.",
       "criteria": "Casos ejecutados, incidencias registradas y criterio de aceptación verificado.",
-      "jiraKey": null
+      "jiraKey": "FIX-106",
+      "jiraSprintId": 50
     },
     {
       "id": "T52",
@@ -718,7 +779,8 @@
       "status": "In Progress",
       "detail": "Revisión con el usuario, densidad, navegación y claridad.",
       "criteria": "Casos ejecutados, incidencias registradas y criterio de aceptación verificado.",
-      "jiraKey": null
+      "jiraKey": "FIX-107",
+      "jiraSprintId": 50
     },
     {
       "id": "T53",
@@ -731,7 +793,8 @@
       "status": "To Do",
       "detail": "Firma de release, verificación de instalación y versionado.",
       "criteria": "Datos persistidos, casos límite cubiertos y verificación manual o test automatizado.",
-      "jiraKey": null
+      "jiraKey": "FIX-108",
+      "jiraSprintId": 50
     },
     {
       "id": "T54",
@@ -744,12 +807,15 @@
       "status": "In Progress",
       "detail": "Cierre de sprints, tiempos, lecciones y próximos pasos.",
       "criteria": "Casos ejecutados, incidencias registradas y criterio de aceptación verificado.",
-      "jiraKey": null
+      "jiraKey": "FIX-109",
+      "jiraSprintId": 50
     }
   ],
   "totals": {
     "tasks": 54,
     "hours": 820,
     "points": 118
-  }
+  },
+  "jiraApplied": "2026-11-04",
+  "jiraBoard": "https://jaxsullivan7.atlassian.net/jira/software/projects/FIX/boards/5"
 }
