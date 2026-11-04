@@ -20,18 +20,24 @@ class FixRepository(context: Context) {
 
     private fun load(): AppState {
         if (!file.exists()) return AppState()
-        val parsed = runCatching {
+
+        val main = runCatching {
             JSONObject(file.readText()).toState().sanitized()
-        }.getOrElse {
-            runCatching {
-                if (backupFile.exists()) {
-                    JSONObject(backupFile.readText()).toState().sanitized()
-                } else {
-                    null
-                }
-            }.getOrNull()
+        }.getOrNull()
+        if (main != null) {
+            return main.copy(settings = main.settings.copy(onboarded = true))
         }
-        return parsed?.copy(settings = parsed.settings.copy(onboarded = true)) ?: AppState()
+
+        val recovered = runCatching {
+            if (!backupFile.exists()) return@runCatching null
+            JSONObject(backupFile.readText()).toState().sanitized()
+        }.getOrNull()
+        if (recovered != null) {
+            // Restaura la copia buena antes de que el siguiente guardado la sobrescriba.
+            runCatching { backupFile.copyTo(file, overwrite = true) }
+            return recovered.copy(settings = recovered.settings.copy(onboarded = true))
+        }
+        return AppState()
     }
 
     private fun persist(state: AppState) {
