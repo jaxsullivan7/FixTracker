@@ -23,32 +23,47 @@ import androidx.compose.material.icons.outlined.Build
 import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.FactCheck
+import androidx.compose.material.icons.outlined.LocalGasStation
 import androidx.compose.material.icons.outlined.NotificationsNone
+import androidx.compose.material.icons.outlined.PictureAsPdf
 import androidx.compose.material.icons.outlined.Shield
+import androidx.compose.material.icons.outlined.Speed
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.fixtracker.app.data.AppState
+import com.fixtracker.app.data.HealthStatus
+import com.fixtracker.app.data.PlanItem
+import com.fixtracker.app.data.PlanStatus
 import com.fixtracker.app.data.ServiceRecord
+import com.fixtracker.app.data.ServiceType
 import com.fixtracker.app.data.Vehicle
+import com.fixtracker.app.data.buildMaintenancePlan
+import com.fixtracker.app.data.calculateFuelStats
+import com.fixtracker.app.data.healthFor
+import com.fixtracker.app.data.mileageStatsFor
+import com.fixtracker.app.data.spendByTypeFor
 import com.fixtracker.app.ui.components.ConfirmDialog
 import com.fixtracker.app.ui.components.FixCard
 import com.fixtracker.app.ui.components.Hairline
+import com.fixtracker.app.ui.components.KmSparkline
+import com.fixtracker.app.ui.components.PillButton
 import com.fixtracker.app.ui.components.PrimaryButton
 import com.fixtracker.app.ui.components.ScreenHeader
 import com.fixtracker.app.ui.components.SectionHeader
@@ -57,14 +72,20 @@ import com.fixtracker.app.ui.components.ThinProgress
 import com.fixtracker.app.ui.components.TypeGlyph
 import com.fixtracker.app.ui.theme.FixTheme
 import com.fixtracker.app.ui.theme.FixTypography
+import com.fixtracker.app.util.ReportPdf
 import com.fixtracker.app.util.daysUntil
 import com.fixtracker.app.util.dueDateLabel
+import com.fixtracker.app.util.formatConsumption
 import com.fixtracker.app.util.formatDate
 import com.fixtracker.app.util.formatKm
+import com.fixtracker.app.util.formatLiters
 import com.fixtracker.app.util.formatMoney
 import com.fixtracker.app.util.relativePastLabel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDate
-import java.time.YearMonth
+import kotlin.math.roundToInt
 
 @Composable
 fun VehicleDetailScreen(
@@ -78,6 +99,9 @@ fun VehicleDetailScreen(
     onOpenHistory: () -> Unit,
     onSetActive: (String) -> Unit,
     onDelete: (String) -> Unit,
+    onOpenPlan: (String) -> Unit,
+    onOpenFuel: (String) -> Unit,
+    onAddFuel: (String) -> Unit,
 ) {
     val vehicle = state.vehicle(vehicleId)
     if (vehicle == null) {
@@ -90,14 +114,37 @@ fun VehicleDetailScreen(
         }
         return
     }
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val records = state.recordsFor(vehicle.id)
     val reminders = state.remindersFor(vehicle.id)
+    val fuel = state.fuelFor(vehicle.id)
+    val fuelStats = calculateFuelStats(fuel)
+    val mileage = state.mileageStatsFor(vehicle.id)
+    val plan = buildMaintenancePlan(state, vehicle)
+    val health = state.healthFor(vehicle.id)
     val isActive = state.activeVehicleId == vehicle.id
+    val year = LocalDate.now().year
+    val yearFrom = LocalDate.of(year, 1, 1)
+    val yearTo = yearFrom.plusYears(1)
+    val yearSpend = state.spendBetween(vehicle.id, yearFrom, yearTo)
+    val totalSpend = state.spendFor(vehicle.id)
     var confirmDelete by remember { mutableStateOf(false) }
-    val totalSpend = records.sumOf { it.cost }
-    val thisYear = records
-        .filter { it.date.year == LocalDate.now().year }
-        .sumOf { it.cost }
+    var generatingReport by remember { mutableStateOf(false) }
+
+    fun shareReport() {
+        if (generatingReport) return
+        scope.launch {
+            generatingReport = true
+            val file = withContext(Dispatchers.IO) {
+                runCatching { ReportPdf.generate(context, state, vehicle) }.getOrNull()
+            }
+            generatingReport = false
+            if (file != null) {
+                runCatching { ReportPdf.share(context, file) }
+            }
+        }
+    }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -108,7 +155,7 @@ fun VehicleDetailScreen(
                 title = "Ficha del vehículo",
                 onBack = onBack,
                 trailing = {
-                    androidx.compose.material3.IconButton(onClick = { onEdit(vehicle.id) }) {
+                    IconButton(onClick = { onEdit(vehicle.id) }) {
                         Icon(
                             Icons.Outlined.Edit,
                             contentDescription = "Editar vehículo",
@@ -119,7 +166,7 @@ fun VehicleDetailScreen(
                 },
             )
             Spacer(Modifier.height(10.dp))
-            DetailHero(vehicle)
+            DetailHero(vehicle, health)
         }
 
         item {
@@ -136,8 +183,8 @@ fun VehicleDetailScreen(
                     modifier = Modifier.weight(1f),
                 )
                 StatTile(
-                    label = "ESTE AÑO",
-                    value = formatMoney(thisYear, state.settings.currency),
+                    label = "MEDIA",
+                    value = mileage.kmPerMonth?.let { "${formatKm(it.roundToInt())} km/mes" } ?: "—",
                     modifier = Modifier.weight(1f),
                 )
             }
@@ -172,9 +219,78 @@ fun VehicleDetailScreen(
         }
 
         item {
-            Spacer(Modifier.height(28.dp))
+            Spacer(Modifier.height(24.dp))
+            FixCard(modifier = Modifier.fillMaxWidth()) {
+                Column(Modifier.padding(16.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = "Kilometraje",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.weight(1f),
+                        )
+                        Text(
+                            text = vehicle.kmUpdatedAt?.let { "Actualizado ${relativePastLabel(it).lowercase()}" }
+                                ?: "Sin actualizar",
+                            style = MaterialTheme.typography.bodySmall.copy(fontSize = 10.5.sp),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    Spacer(Modifier.height(7.dp))
+                    Row(verticalAlignment = Alignment.Bottom) {
+                        Text(
+                            text = formatKm(vehicle.km),
+                            style = FixTypography.headlineLarge.copy(fontSize = 30.sp),
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                        Spacer(Modifier.width(5.dp))
+                        Text(
+                            text = "km",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(bottom = 4.dp),
+                        )
+                        Spacer(Modifier.weight(1f))
+                        mileage.kmPerMonth?.let {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    Icons.Outlined.Speed,
+                                    contentDescription = null,
+                                    tint = FixTheme.palette.copper,
+                                    modifier = Modifier.size(14.dp),
+                                )
+                                Spacer(Modifier.width(4.dp))
+                                Text(
+                                    text = "${formatKm(it.roundToInt())} km/mes",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = FixTheme.palette.copper,
+                                )
+                            }
+                        }
+                    }
+                    Spacer(Modifier.height(10.dp))
+                    KmSparkline(
+                        values = mileage.points.map { it.second }.takeLast(30),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp),
+                    )
+                    if (mileage.points.size < 2) {
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            text = "Añade servicios o repostajes para estimar tu uso mensual.",
+                            style = MaterialTheme.typography.bodySmall.copy(fontSize = 10.5.sp),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+            }
+        }
+
+        item {
+            Spacer(Modifier.height(26.dp))
             SectionHeader(title = "Documentación")
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(10.dp))
             FixCard(modifier = Modifier.fillMaxWidth()) {
                 DocumentRow(
                     icon = Icons.AutoMirrored.Outlined.FactCheck,
@@ -189,17 +305,126 @@ fun VehicleDetailScreen(
                     date = vehicle.insuranceUntil,
                     accent = FixTheme.palette.blue,
                 )
+                Hairline(Modifier.padding(horizontal = 14.dp))
+                DocumentRow(
+                    icon = Icons.AutoMirrored.Outlined.FactCheck,
+                    title = "Impuesto de circulación",
+                    date = vehicle.roadTaxUntil,
+                    accent = FixTheme.palette.positive,
+                )
             }
         }
 
         item {
-            Spacer(Modifier.height(28.dp))
+            Spacer(Modifier.height(26.dp))
+            SectionHeader(
+                title = "Plan de mantenimiento",
+                action = "Ver plan",
+                onAction = { onOpenPlan(vehicle.id) },
+            )
+            Spacer(Modifier.height(10.dp))
+            FixCard(modifier = Modifier.fillMaxWidth()) {
+                val upcoming = plan.take(3)
+                upcoming.forEachIndexed { index, item ->
+                    PlanPreviewRow(
+                        item = item,
+                        vehicle = vehicle,
+                        onClick = { onAddRecord(vehicle.id) },
+                    )
+                    if (index != upcoming.lastIndex) Hairline(Modifier.padding(horizontal = 14.dp))
+                }
+            }
+        }
+
+        item {
+            Spacer(Modifier.height(26.dp))
+            SectionHeader(
+                title = "Combustible",
+                action = if (fuel.isEmpty()) null else "Ver todo",
+                onAction = { onOpenFuel(vehicle.id) },
+            )
+            Spacer(Modifier.height(10.dp))
+            FixCard(modifier = Modifier.fillMaxWidth()) {
+                Column(Modifier.padding(16.dp)) {
+                    Row(verticalAlignment = Alignment.Bottom) {
+                        Column(Modifier.weight(1f)) {
+                            Text(
+                                text = "CONSUMO MEDIO",
+                                style = MaterialTheme.typography.labelSmall.copy(letterSpacing = 1.1.sp),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            Spacer(Modifier.height(4.dp))
+                            Text(
+                                text = formatConsumption(fuelStats.averageConsumption),
+                                style = FixTypography.headlineLarge.copy(fontSize = 26.sp),
+                                color = MaterialTheme.colorScheme.onSurface,
+                            )
+                            Text(
+                                text = fuelStats.lastConsumption?.let { "Último: ${formatConsumption(it)}" }
+                                    ?: "Sin depósitos completos",
+                                style = MaterialTheme.typography.bodySmall.copy(fontSize = 10.5.sp),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        Column(horizontalAlignment = Alignment.End) {
+                            Text(
+                                text = formatMoney(fuelStats.yearSpend, state.settings.currency),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onSurface,
+                            )
+                            Text(
+                                text = "este año · ${formatLiters(fuelStats.yearLiters)}",
+                                style = MaterialTheme.typography.bodySmall.copy(fontSize = 10.sp),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            Spacer(Modifier.height(8.dp))
+                            Row(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(50))
+                                    .clickable { onAddFuel(vehicle.id) }
+                                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Icon(
+                                    Icons.Outlined.LocalGasStation,
+                                    contentDescription = null,
+                                    tint = FixTheme.palette.copper,
+                                    modifier = Modifier.size(13.dp),
+                                )
+                                Spacer(Modifier.width(4.dp))
+                                Text(
+                                    text = "Repostar",
+                                    style = MaterialTheme.typography.labelMedium.copy(fontSize = 10.5.sp),
+                                    color = FixTheme.palette.copper,
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        item {
+            Spacer(Modifier.height(26.dp))
+            SectionHeader(title = "Gastos del año")
+            Spacer(Modifier.height(10.dp))
+            SpendingBreakdown(
+                state = state,
+                vehicle = vehicle,
+                year = year,
+                total = yearSpend,
+                budget = state.settings.annualBudget,
+            )
+        }
+
+        item {
+            Spacer(Modifier.height(26.dp))
             SectionHeader(
                 title = "Avisos",
                 action = if (reminders.isNotEmpty()) "Ver todo" else null,
                 onAction = onOpenReminders,
             )
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(10.dp))
             if (reminders.isEmpty()) {
                 FixCard(modifier = Modifier.fillMaxWidth()) {
                     Row(
@@ -267,13 +492,13 @@ fun VehicleDetailScreen(
         }
 
         item {
-            Spacer(Modifier.height(28.dp))
+            Spacer(Modifier.height(26.dp))
             SectionHeader(
                 title = "Historial",
                 action = if (records.isNotEmpty()) "Ver todo" else null,
                 onAction = onOpenHistory,
             )
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(10.dp))
             if (records.isEmpty()) {
                 FixCard(modifier = Modifier.fillMaxWidth()) {
                     Text(
@@ -304,6 +529,21 @@ fun VehicleDetailScreen(
                 icon = Icons.Outlined.Build,
                 onClick = { onAddRecord(vehicle.id) },
             )
+            Spacer(Modifier.height(10.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(9.dp)) {
+                PillButton(
+                    text = "Añadir repostaje",
+                    icon = Icons.Outlined.LocalGasStation,
+                    onClick = { onAddFuel(vehicle.id) },
+                    modifier = Modifier.weight(1f),
+                )
+                PillButton(
+                    text = if (generatingReport) "Generando…" else "Informe PDF",
+                    icon = Icons.Outlined.PictureAsPdf,
+                    onClick = { shareReport() },
+                    modifier = Modifier.weight(1f),
+                )
+            }
         }
 
         item {
@@ -336,7 +576,7 @@ fun VehicleDetailScreen(
     if (confirmDelete) {
         ConfirmDialog(
             title = "¿Eliminar ${vehicle.fullName}?",
-            message = "Se borrarán también todos sus servicios y avisos. Esta acción no se puede deshacer.",
+            message = "Se borrarán también todos sus servicios, repostajes, fotos y avisos. Esta acción no se puede deshacer.",
             onConfirm = {
                 confirmDelete = false
                 onDelete(vehicle.id)
@@ -347,13 +587,23 @@ fun VehicleDetailScreen(
 }
 
 @Composable
-private fun DetailHero(vehicle: Vehicle) {
+private fun DetailHero(vehicle: Vehicle, health: HealthStatus) {
     val palette = FixTheme.palette
     val days = vehicle.daysToService()
     val kmLeft = vehicle.kmToService()
     val progress = kmLeft?.let {
         1f - (it.toFloat() / vehicle.serviceKmInterval).coerceIn(0f, 1f)
     } ?: 0f
+    val healthLabel = when (health) {
+        HealthStatus.OVERDUE -> "Vencido"
+        HealthStatus.SOON -> "Próximo"
+        HealthStatus.OK -> "Al día"
+    }
+    val healthColor = when (health) {
+        HealthStatus.OVERDUE -> palette.danger
+        HealthStatus.SOON -> palette.copper
+        HealthStatus.OK -> palette.positive
+    }
 
     Box(
         modifier = Modifier
@@ -368,6 +618,19 @@ private fun DetailHero(vehicle: Vehicle) {
                     style = MaterialTheme.typography.labelSmall.copy(letterSpacing = 1.5.sp),
                     color = Color.White.copy(alpha = 0.55f),
                 )
+                Spacer(Modifier.width(8.dp))
+                Box(
+                    Modifier
+                        .clip(RoundedCornerShape(50))
+                        .background(healthColor.copy(alpha = 0.2f))
+                        .padding(horizontal = 8.dp, vertical = 3.dp),
+                ) {
+                    Text(
+                        text = healthLabel,
+                        style = MaterialTheme.typography.labelMedium.copy(fontSize = 9.5.sp),
+                        color = Color.White,
+                    )
+                }
                 Spacer(Modifier.weight(1f))
                 Box(
                     Modifier
@@ -468,7 +731,7 @@ private fun StatTile(label: String, value: String, modifier: Modifier = Modifier
         Spacer(Modifier.height(5.dp))
         Text(
             text = value,
-            style = MaterialTheme.typography.titleMedium.copy(fontSize = 14.sp),
+            style = MaterialTheme.typography.titleSmall.copy(fontSize = 12.5.sp),
             color = MaterialTheme.colorScheme.onSurface,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -558,5 +821,184 @@ private fun DetailRecordRow(
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurface,
         )
+    }
+}
+
+@Composable
+private fun PlanPreviewRow(item: PlanItem, vehicle: Vehicle, onClick: () -> Unit) {
+    val palette = FixTheme.palette
+    val status = item.status(vehicle)
+    val label = when (status) {
+        PlanStatus.OVERDUE -> "Vencido"
+        PlanStatus.SOON -> "Próximo"
+        PlanStatus.OK -> "Al día"
+        PlanStatus.UNKNOWN -> "Sin datos"
+    }
+    val color = when (status) {
+        PlanStatus.OVERDUE -> palette.danger
+        PlanStatus.SOON -> palette.copper
+        PlanStatus.OK -> palette.positive
+        PlanStatus.UNKNOWN -> MaterialTheme.colorScheme.onSurfaceVariant
+    }
+    val bg = when (status) {
+        PlanStatus.OVERDUE -> palette.dangerSoft
+        PlanStatus.SOON -> palette.copperSoft
+        PlanStatus.OK -> palette.positiveSoft
+        PlanStatus.UNKNOWN -> palette.surfaceAlt
+    }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(horizontal = 14.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        TypeGlyph(item.type, size = 38.dp, iconSize = 17.dp)
+        Spacer(Modifier.width(11.dp))
+        Column(Modifier.weight(1f)) {
+            Text(
+                text = item.title,
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            Text(
+                text = buildString {
+                    item.dueDate?.let { append(dueDateLabel(it)) }
+                    item.dueKm?.let {
+                        if (isNotEmpty()) append("  ·  ")
+                        val left = it - vehicle.km
+                        append(if (left > 0) "en ${formatKm(left)} km" else "km superados")
+                    }
+                }.ifBlank { "Sin próximo servicio" },
+                style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        StatusChip(text = label, color = color, background = bg)
+    }
+}
+
+@Composable
+private fun SpendingBreakdown(
+    state: AppState,
+    vehicle: Vehicle,
+    year: Int,
+    total: Double,
+    budget: Double?,
+) {
+    val fuel = state.fuelFor(vehicle.id).filter { it.date.year == year }.sumOf { it.totalCost }
+    val byType = state.spendByTypeFor(vehicle.id, year)
+    val maintenance = listOf(
+        ServiceType.ACEITE,
+        ServiceType.FILTROS,
+        ServiceType.FRENOS,
+        ServiceType.NEUMATICOS,
+        ServiceType.REVISION,
+        ServiceType.REPARACION,
+    ).sumOf { byType[it] ?: 0.0 }
+    val rows = listOf(
+        "Combustible" to fuel,
+        "Mantenimiento" to maintenance,
+        "Seguro" to (byType[ServiceType.SEGURO] ?: 0.0),
+        "ITV" to (byType[ServiceType.ITV] ?: 0.0),
+        "Otros" to (byType[ServiceType.OTRO] ?: 0.0),
+    ).filter { it.second > 0.0 }.sortedByDescending { it.second }
+
+    FixCard(modifier = Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.Bottom) {
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        text = "TOTAL ${year}",
+                        style = MaterialTheme.typography.labelSmall.copy(letterSpacing = 1.1.sp),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        text = formatMoney(total, state.settings.currency),
+                        style = FixTypography.headlineMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                }
+                Text(
+                    text = "Servicios + combustible",
+                    style = MaterialTheme.typography.bodySmall.copy(fontSize = 10.5.sp),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            if (rows.isEmpty()) {
+                Spacer(Modifier.height(10.dp))
+                Text(
+                    text = "Aún no hay gastos este año.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            } else {
+                val max = rows.maxOf { it.second }
+                Spacer(Modifier.height(16.dp))
+                rows.take(5).forEachIndexed { index, (label, amount) ->
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = label,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.width(100.dp),
+                        )
+                        ThinProgress(
+                            progress = (amount / max).toFloat(),
+                            color = when (index) {
+                                0 -> FixTheme.palette.copper
+                                1 -> MaterialTheme.colorScheme.primary
+                                else -> FixTheme.palette.blue
+                            },
+                            modifier = Modifier.weight(1f),
+                        )
+                        Spacer(Modifier.width(10.dp))
+                        Text(
+                            text = formatMoney(amount, state.settings.currency),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.width(70.dp),
+                        )
+                    }
+                    if (index != rows.take(5).lastIndex) Spacer(Modifier.height(9.dp))
+                }
+            }
+
+            if (budget != null && budget > 0) {
+                Spacer(Modifier.height(14.dp))
+                Hairline()
+                Spacer(Modifier.height(12.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "Presupuesto anual",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.weight(1f),
+                    )
+                    Text(
+                        text = formatMoney(budget, state.settings.currency),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                }
+                Spacer(Modifier.height(7.dp))
+                ThinProgress(
+                    progress = (total / budget).toFloat().coerceIn(0f, 1f),
+                    color = if (total > budget) FixTheme.palette.danger else MaterialTheme.colorScheme.primary,
+                )
+                Spacer(Modifier.height(6.dp))
+                Text(
+                    text = if (total > budget) {
+                        "Superado por ${formatMoney(total - budget, state.settings.currency)}"
+                    } else {
+                        "Te quedan ${formatMoney(budget - total, state.settings.currency)}"
+                    },
+                    style = MaterialTheme.typography.bodySmall.copy(fontSize = 10.5.sp),
+                    color = if (total > budget) FixTheme.palette.danger
+                    else MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
     }
 }

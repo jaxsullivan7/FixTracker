@@ -27,6 +27,15 @@ fun formatMoney(value: Double, currencyCode: String = "EUR"): String {
 
 fun formatDate(date: LocalDate): String = date.format(dayMonthYear)
 
+fun formatLiters(value: Double): String =
+    String.format(spanish, "%.1f L", value)
+
+fun formatConsumption(value: Double?): String =
+    value?.let { String.format(spanish, "%.1f L/100", it) } ?: "—"
+
+fun formatPricePerLiter(value: Double?): String =
+    value?.let { String.format(spanish, "%.2f €/L", it) } ?: "—"
+
 fun formatDateShort(date: LocalDate): String = date.format(dayMonth)
 
 fun formatMonth(date: LocalDate): String =

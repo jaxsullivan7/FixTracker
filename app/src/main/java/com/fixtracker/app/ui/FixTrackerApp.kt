@@ -25,18 +25,29 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Build
 import androidx.compose.material.icons.outlined.DirectionsCar
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.LocalGasStation
+import androidx.compose.material.icons.outlined.NotificationsNone
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,9 +59,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.fixtracker.app.data.AppState
 import com.fixtracker.app.data.FixRepository
-import com.fixtracker.app.data.Settings
+import com.fixtracker.app.data.ServiceType
+import com.fixtracker.app.ui.screens.FuelFormScreen
+import com.fixtracker.app.ui.screens.FuelScreen
 import com.fixtracker.app.ui.screens.HistoryScreen
 import com.fixtracker.app.ui.screens.HomeScreen
+import com.fixtracker.app.ui.screens.PlanScreen
 import com.fixtracker.app.ui.screens.RecordDetailScreen
 import com.fixtracker.app.ui.screens.RecordFormScreen
 import com.fixtracker.app.ui.screens.RemindersScreen
@@ -59,6 +73,7 @@ import com.fixtracker.app.ui.screens.VehicleDetailScreen
 import com.fixtracker.app.ui.screens.VehicleFormScreen
 import com.fixtracker.app.ui.screens.VehiclesScreen
 import com.fixtracker.app.ui.theme.FixTheme
+import kotlinx.coroutines.launch
 
 sealed interface Screen {
     data object Home : Screen
@@ -69,17 +84,37 @@ sealed interface Screen {
     data object AddVehicle : Screen
     data class VehicleDetail(val id: String) : Screen
     data class EditVehicle(val id: String) : Screen
-    data class AddRecord(val vehicleId: String?) : Screen
+    data class AddRecord(
+        val vehicleId: String?,
+        val recordId: String? = null,
+        val initialType: ServiceType? = null,
+    ) : Screen
     data class RecordDetail(val id: String) : Screen
+    data class Fuel(val vehicleId: String) : Screen
+    data class AddFuel(val vehicleId: String, val entryId: String? = null) : Screen
+    data class Plan(val vehicleId: String) : Screen
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FixTrackerApp(
     state: AppState,
     repository: FixRepository,
+    initialOpenReminders: Boolean = false,
+    onInitialRemindersHandled: () -> Unit = {},
 ) {
     var stack by remember { mutableStateOf<List<Screen>>(listOf(Screen.Home)) }
     val current = stack.last()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    var showQuickAdd by remember { mutableStateOf(false) }
+
+    LaunchedEffect(initialOpenReminders) {
+        if (initialOpenReminders) {
+            stack = listOf(Screen.Home, Screen.Reminders)
+            onInitialRemindersHandled()
+        }
+    }
 
     fun push(screen: Screen) {
         stack = stack + screen
@@ -93,6 +128,33 @@ fun FixTrackerApp(
         stack = listOf(screen)
     }
 
+    fun showUndo(message: String, onUndo: () -> Unit) {
+        scope.launch {
+            snackbarHostState.currentSnackbarData?.dismiss()
+            val result = snackbarHostState.showSnackbar(
+                message = message,
+                actionLabel = "Deshacer",
+                withDismissAction = true,
+                duration = SnackbarDuration.Long,
+            )
+            if (result == SnackbarResult.ActionPerformed) onUndo()
+        }
+    }
+
+    fun deleteRecordWithUndo(recordId: String) {
+        val record = state.records.firstOrNull { it.id == recordId } ?: return
+        repository.deleteRecord(recordId)
+        pop()
+        showUndo("Servicio eliminado") { repository.restoreRecord(record) }
+    }
+
+    fun deleteFuelWithUndo(entryId: String) {
+        val entry = state.fuelEntries.firstOrNull { it.id == entryId } ?: return
+        repository.deleteFuelEntry(entryId)
+        pop()
+        showUndo("Repostaje eliminado") { repository.addFuelEntry(entry) }
+    }
+
     BackHandler(enabled = stack.size > 1) { pop() }
 
     val isTab = current is Screen.Home || current is Screen.Vehicles ||
@@ -100,18 +162,19 @@ fun FixTrackerApp(
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             if (isTab) {
                 FixBottomBar(
                     current = current,
                     onSelect = { openTab(it) },
                     onAdd = {
-                        val target = state.activeVehicle?.id
-                        if (target == null) {
+                        val active = state.activeVehicle
+                        if (active == null) {
                             openTab(Screen.Vehicles)
                             push(Screen.AddVehicle)
                         } else {
-                            push(Screen.AddRecord(target))
+                            showQuickAdd = true
                         }
                     },
                 )
@@ -136,6 +199,8 @@ fun FixTrackerApp(
                     onAddRecord = {
                         state.activeVehicle?.let { push(Screen.AddRecord(it.id)) }
                     },
+                    onAddFuel = { push(Screen.AddFuel(it)) },
+                    onOpenFuel = { push(Screen.Fuel(it)) },
                     onUpdateKm = { km ->
                         state.activeVehicle?.let { repository.updateKm(it.id, km) }
                     },
@@ -146,6 +211,7 @@ fun FixTrackerApp(
                         openTab(Screen.Vehicles)
                         push(Screen.AddVehicle)
                     },
+                    onSetActive = { repository.setActiveVehicle(it) },
                 )
 
                 is Screen.Vehicles -> VehiclesScreen(
@@ -161,17 +227,18 @@ fun FixTrackerApp(
 
                 is Screen.Settings -> SettingsScreen(
                     state = state,
+                    repository = repository,
                     onUpdateSettings = { repository.updateSettings(it) },
                     onUpdateName = { repository.updateOwnerName(it) },
                     onReset = { repository.resetDemo() },
                     onClearAll = { repository.clearAll() },
-                    exportJson = { repository.exportJson() },
                 )
 
                 is Screen.Reminders -> RemindersScreen(
                     state = state,
                     onBack = { pop() },
                     onToggle = { repository.toggleReminder(it) },
+                    onSnooze = { id, until -> repository.snoozeReminder(id, until) },
                     onAdd = { repository.addReminder(it) },
                 )
 
@@ -189,14 +256,56 @@ fun FixTrackerApp(
                         repository.deleteVehicle(it)
                         pop()
                     },
+                    onOpenPlan = { push(Screen.Plan(it)) },
+                    onOpenFuel = { push(Screen.Fuel(it)) },
+                    onAddFuel = { push(Screen.AddFuel(it)) },
+                )
+
+                is Screen.Plan -> PlanScreen(
+                    state = state,
+                    vehicleId = screen.vehicleId,
+                    onBack = { pop() },
+                    onAddRecord = { type ->
+                        push(Screen.AddRecord(screen.vehicleId, initialType = type))
+                    },
+                )
+
+                is Screen.Fuel -> FuelScreen(
+                    state = state,
+                    vehicleId = screen.vehicleId,
+                    onBack = { pop() },
+                    onAdd = { push(Screen.AddFuel(screen.vehicleId)) },
+                    onEdit = { push(Screen.AddFuel(screen.vehicleId, it)) },
+                )
+
+                is Screen.AddFuel -> FuelFormScreen(
+                    state = state,
+                    initialVehicleId = screen.vehicleId,
+                    editingEntryId = screen.entryId,
+                    onClose = { pop() },
+                    onSave = { entry ->
+                        if (state.fuelEntries.any { it.id == entry.id }) {
+                            repository.updateFuelEntry(entry)
+                        } else {
+                            repository.addFuelEntry(entry)
+                        }
+                        pop()
+                    },
+                    onDelete = { deleteFuelWithUndo(it) },
                 )
 
                 is Screen.AddRecord -> RecordFormScreen(
                     state = state,
                     initialVehicleId = screen.vehicleId,
+                    editingRecordId = screen.recordId,
+                    initialType = screen.initialType,
                     onClose = { pop() },
-                    onSave = {
-                        repository.addRecord(it)
+                    onSave = { record ->
+                        if (state.records.any { it.id == record.id }) {
+                            repository.updateRecord(record)
+                        } else {
+                            repository.addRecord(record)
+                        }
                         pop()
                     },
                 )
@@ -205,10 +314,13 @@ fun FixTrackerApp(
                     state = state,
                     recordId = screen.id,
                     onBack = { pop() },
-                    onDelete = {
-                        repository.deleteRecord(it)
-                        pop()
+                    onEdit = { id ->
+                        val record = state.records.firstOrNull { it.id == id }
+                        if (record != null) {
+                            push(Screen.AddRecord(record.vehicleId, recordId = record.id))
+                        }
                     },
+                    onDelete = { deleteRecordWithUndo(it) },
                 )
 
                 is Screen.AddVehicle -> VehicleFormScreen(
@@ -232,6 +344,135 @@ fun FixTrackerApp(
                 )
             }
         }
+    }
+
+    if (showQuickAdd) {
+        QuickAddSheet(
+            onDismiss = { showQuickAdd = false },
+            onService = {
+                showQuickAdd = false
+                state.activeVehicle?.let { push(Screen.AddRecord(it.id)) }
+            },
+            onFuel = {
+                showQuickAdd = false
+                state.activeVehicle?.let { push(Screen.AddFuel(it.id)) }
+            },
+            onReminder = {
+                showQuickAdd = false
+                push(Screen.Reminders)
+            },
+            onVehicle = {
+                showQuickAdd = false
+                openTab(Screen.Vehicles)
+                push(Screen.AddVehicle)
+            },
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun QuickAddSheet(
+    onDismiss: () -> Unit,
+    onService: () -> Unit,
+    onFuel: () -> Unit,
+    onReminder: () -> Unit,
+    onVehicle: () -> Unit,
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        containerColor = MaterialTheme.colorScheme.surface,
+        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+    ) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .navigationBarsPadding()
+                .padding(start = 20.dp, end = 20.dp, bottom = 30.dp),
+        ) {
+            Text(
+                text = "¿Qué quieres registrar?",
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            Spacer(Modifier.height(16.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                QuickAddTile(
+                    label = "Servicio",
+                    description = "Taller o mantenimiento",
+                    icon = Icons.Outlined.Build,
+                    onClick = onService,
+                    modifier = Modifier.weight(1f),
+                )
+                QuickAddTile(
+                    label = "Repostaje",
+                    description = "Litros y precio",
+                    icon = Icons.Outlined.LocalGasStation,
+                    onClick = onFuel,
+                    modifier = Modifier.weight(1f),
+                )
+            }
+            Spacer(Modifier.height(10.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                QuickAddTile(
+                    label = "Recordatorio",
+                    description = "Una fecha o un km",
+                    icon = Icons.Outlined.NotificationsNone,
+                    onClick = onReminder,
+                    modifier = Modifier.weight(1f),
+                )
+                QuickAddTile(
+                    label = "Vehículo",
+                    description = "Añadir al garaje",
+                    icon = Icons.Outlined.DirectionsCar,
+                    onClick = onVehicle,
+                    modifier = Modifier.weight(1f),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun QuickAddTile(
+    label: String,
+    description: String,
+    icon: ImageVector,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(20.dp))
+            .background(FixTheme.palette.surfaceAlt)
+            .clickable(onClick = onClick)
+            .padding(14.dp),
+    ) {
+        Box(
+            Modifier
+                .size(38.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.surface),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(18.dp),
+            )
+        }
+        Spacer(Modifier.height(10.dp))
+        Text(
+            text = label,
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+        Text(
+            text = description,
+            style = MaterialTheme.typography.bodySmall.copy(fontSize = 10.5.sp),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 
@@ -289,7 +530,7 @@ private fun FixBottomBar(
                 ) {
                     Icon(
                         Icons.Outlined.Add,
-                        contentDescription = "Añadir servicio",
+                        contentDescription = "Añadir",
                         tint = Color.White,
                         modifier = Modifier.size(23.dp),
                     )

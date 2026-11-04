@@ -1,5 +1,6 @@
 package com.fixtracker.app.ui.components
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -59,7 +60,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Fill
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -796,4 +804,55 @@ fun MutedText(text: String, modifier: Modifier = Modifier, size: TextUnit = 13.s
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = modifier,
     )
+}
+
+@Composable
+fun KmSparkline(
+    values: List<Int>,
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.primary,
+) {
+    Canvas(modifier) {
+        if (values.size < 2) return@Canvas
+        val min = values.min().toFloat()
+        val max = values.max().toFloat()
+        val range = (max - min).coerceAtLeast(1f)
+        val verticalPadding = size.height * 0.16f
+        val usableHeight = size.height - verticalPadding * 2
+        val step = size.width / (values.size - 1)
+
+        val points = values.mapIndexed { index, value ->
+            Offset(
+                x = index * step,
+                y = size.height - verticalPadding - ((value - min) / range) * usableHeight,
+            )
+        }
+
+        val line = Path().apply {
+            moveTo(points.first().x, points.first().y)
+            points.drop(1).forEach { point -> lineTo(point.x, point.y) }
+        }
+        val area = Path().apply {
+            addPath(line)
+            lineTo(points.last().x, size.height)
+            lineTo(points.first().x, size.height)
+            close()
+        }
+
+        drawPath(
+            path = area,
+            brush = Brush.verticalGradient(
+                listOf(color.copy(alpha = 0.18f), Color.Transparent),
+                startY = 0f,
+                endY = size.height,
+            ),
+            style = Fill,
+        )
+        drawPath(
+            path = line,
+            color = color,
+            style = Stroke(width = 2.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round),
+        )
+        drawCircle(color = color, radius = 3.dp.toPx(), center = points.last())
+    }
 }

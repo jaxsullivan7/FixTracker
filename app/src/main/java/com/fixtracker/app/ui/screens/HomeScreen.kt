@@ -21,13 +21,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Build
+import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.ChevronRight
+import androidx.compose.material.icons.outlined.DirectionsCar
+import androidx.compose.material.icons.outlined.LocalGasStation
 import androidx.compose.material.icons.outlined.NotificationsNone
 import androidx.compose.material.icons.outlined.Speed
 import androidx.compose.material.icons.outlined.WaterDrop
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -50,10 +55,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.fixtracker.app.data.AppState
+import com.fixtracker.app.data.HealthStatus
 import com.fixtracker.app.data.Reminder
 import com.fixtracker.app.data.ServiceRecord
 import com.fixtracker.app.data.ServiceType
 import com.fixtracker.app.data.Vehicle
+import com.fixtracker.app.data.healthFor
 import com.fixtracker.app.ui.components.AppTextField
 import com.fixtracker.app.ui.components.EmptyState
 import com.fixtracker.app.ui.components.FixCard
@@ -77,29 +84,40 @@ import com.fixtracker.app.util.relativePastLabel
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.YearMonth
-import kotlin.math.abs
+import java.time.temporal.ChronoUnit
 import kotlin.math.roundToInt
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     state: AppState,
     onOpenVehicle: (String) -> Unit,
     onOpenRecord: (String) -> Unit,
     onAddRecord: () -> Unit,
+    onAddFuel: (String) -> Unit,
+    onOpenFuel: (String) -> Unit,
     onUpdateKm: (Int) -> Unit,
     onOpenReminders: () -> Unit,
     onOpenHistory: () -> Unit,
     onOpenSettings: () -> Unit,
     onAddVehicle: () -> Unit,
+    onSetActive: (String) -> Unit,
 ) {
     val vehicle = state.activeVehicle
     val reminders = vehicle?.let { v ->
-        state.remindersFor(v.id).sortedBy { r ->
-            r.dueDate?.let { daysUntil(it) } ?: 999
-        }
+        state.remindersFor(v.id)
+            .filterNot { it.isSnoozed() }
+            .sortedBy { r ->
+                r.dueDate?.let { daysUntil(it) } ?: 999
+            }
     }.orEmpty()
     val records = vehicle?.let { state.recordsFor(it.id) }.orEmpty()
     var showKmDialog by remember { mutableStateOf(false) }
+    var showSwitcher by remember { mutableStateOf(false) }
+    val health = vehicle?.let { state.healthFor(it.id) }
+    val needsKmUpdate = vehicle?.let {
+        it.kmUpdatedAt == null || ChronoUnit.DAYS.between(it.kmUpdatedAt, LocalDate.now()) > 45
+    } == true
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -128,6 +146,61 @@ fun HomeScreen(
                 style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.onBackground,
             )
+            if (vehicle != null) {
+                Spacer(Modifier.height(12.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(50))
+                            .background(MaterialTheme.colorScheme.surface)
+                            .clickable { showSwitcher = true }
+                            .padding(horizontal = 11.dp, vertical = 7.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(
+                            Icons.Outlined.DirectionsCar,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(15.dp),
+                        )
+                        Spacer(Modifier.width(6.dp))
+                        Text(
+                            text = vehicle.plate.ifBlank { vehicle.fullName },
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                        Spacer(Modifier.width(5.dp))
+                        Icon(
+                            Icons.Outlined.ChevronRight,
+                            contentDescription = "Cambiar de vehículo",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                            modifier = Modifier.size(13.dp),
+                        )
+                    }
+                    if (health != null) {
+                        Spacer(Modifier.width(7.dp))
+                        val palette = FixTheme.palette
+                        val label = when (health) {
+                            HealthStatus.OVERDUE -> "Vencido"
+                            HealthStatus.SOON -> "Próximo"
+                            HealthStatus.OK -> "Al día"
+                        }
+                        StatusChip(
+                            text = label,
+                            color = when (health) {
+                                HealthStatus.OVERDUE -> palette.danger
+                                HealthStatus.SOON -> palette.copper
+                                HealthStatus.OK -> palette.positive
+                            },
+                            background = when (health) {
+                                HealthStatus.OVERDUE -> palette.dangerSoft
+                                HealthStatus.SOON -> palette.copperSoft
+                                HealthStatus.OK -> palette.positiveSoft
+                            },
+                        )
+                    }
+                }
+            }
         }
 
         if (vehicle != null) {
@@ -141,11 +214,17 @@ fun HomeScreen(
 
             item {
                 Spacer(Modifier.height(18.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     QuickAction(
                         label = "Servicio",
                         icon = Icons.Outlined.Build,
                         onClick = onAddRecord,
+                        modifier = Modifier.weight(1f),
+                    )
+                    QuickAction(
+                        label = "Combustible",
+                        icon = Icons.Outlined.LocalGasStation,
+                        onClick = { onAddFuel(vehicle.id) },
                         modifier = Modifier.weight(1f),
                     )
                     QuickAction(
@@ -159,6 +238,16 @@ fun HomeScreen(
                         icon = Icons.Outlined.NotificationsNone,
                         onClick = onOpenReminders,
                         modifier = Modifier.weight(1f),
+                    )
+                }
+            }
+
+            if (needsKmUpdate) {
+                item {
+                    Spacer(Modifier.height(10.dp))
+                    KmUpdateBanner(
+                        km = vehicle.km,
+                        onClick = { showKmDialog = true },
                     )
                 }
             }
@@ -257,6 +346,175 @@ fun HomeScreen(
                 onUpdateKm(it)
                 showKmDialog = false
             },
+        )
+    }
+
+    if (showSwitcher) {
+        VehicleSwitcherSheet(
+            state = state,
+            onDismiss = { showSwitcher = false },
+            onSelect = { vehicleId ->
+                onSetActive(vehicleId)
+                showSwitcher = false
+            },
+            onAddVehicle = {
+                showSwitcher = false
+                onAddVehicle()
+            },
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun VehicleSwitcherSheet(
+    state: AppState,
+    onDismiss: () -> Unit,
+    onSelect: (String) -> Unit,
+    onAddVehicle: () -> Unit,
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        containerColor = MaterialTheme.colorScheme.surface,
+        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+    ) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .padding(start = 20.dp, end = 20.dp, bottom = 28.dp),
+        ) {
+            Text(
+                text = "Tu garaje",
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = "Elige el vehículo que quieres ver en Inicio.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(Modifier.height(16.dp))
+            state.vehicles.forEach { v ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(18.dp))
+                        .clickable { onSelect(v.id) }
+                        .padding(horizontal = 10.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Box(
+                        Modifier
+                            .size(44.dp)
+                            .clip(CircleShape)
+                            .background(
+                                if (v.id == state.activeVehicleId) MaterialTheme.colorScheme.primary
+                                else FixTheme.palette.surfaceAlt
+                            ),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            text = initialOf(v.brand),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = if (v.id == state.activeVehicleId) MaterialTheme.colorScheme.onPrimary
+                            else MaterialTheme.colorScheme.onSurface,
+                        )
+                    }
+                    Spacer(Modifier.width(12.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text(
+                            text = v.fullName,
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                        Text(
+                            text = "${v.plate}  ·  ${formatKm(v.km)} km",
+                            style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    if (v.id == state.activeVehicleId) {
+                        Icon(
+                            Icons.Outlined.Check,
+                            contentDescription = "Activo",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(19.dp),
+                        )
+                    }
+                }
+            }
+            Spacer(Modifier.height(8.dp))
+            Hairline()
+            Spacer(Modifier.height(8.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp))
+                    .clickable(onClick = onAddVehicle)
+                    .padding(horizontal = 10.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    Icons.Outlined.Add,
+                    contentDescription = null,
+                    tint = FixTheme.palette.copper,
+                    modifier = Modifier.size(18.dp),
+                )
+                Spacer(Modifier.width(9.dp))
+                Text(
+                    text = "Añadir vehículo",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = FixTheme.palette.copper,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun KmUpdateBanner(km: Int, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(18.dp))
+            .background(MaterialTheme.colorScheme.surface)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 14.dp, vertical = 11.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(
+            Modifier
+                .size(32.dp)
+                .clip(CircleShape)
+                .background(FixTheme.palette.copperSoft),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                Icons.Outlined.Speed,
+                contentDescription = null,
+                tint = FixTheme.palette.copper,
+                modifier = Modifier.size(16.dp),
+            )
+        }
+        Spacer(Modifier.width(10.dp))
+        Column(Modifier.weight(1f)) {
+            Text(
+                text = "¿Sigues en ${formatKm(km)} km?",
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            Text(
+                text = "Actualiza el kilometraje para afinar los avisos.",
+                style = MaterialTheme.typography.bodySmall.copy(fontSize = 10.5.sp),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        Icon(
+            Icons.Outlined.ChevronRight,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+            modifier = Modifier.size(16.dp),
         )
     }
 }
@@ -562,8 +820,10 @@ private fun QuickAction(
         Spacer(Modifier.height(7.dp))
         Text(
             text = label,
-            style = MaterialTheme.typography.labelMedium.copy(fontSize = 11.sp),
+            style = MaterialTheme.typography.labelMedium.copy(fontSize = 10.2.sp),
             color = MaterialTheme.colorScheme.onSurface,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
         )
     }
 }
@@ -641,10 +901,11 @@ private fun SpendCard(state: AppState, vehicle: Vehicle) {
     val palette = FixTheme.palette
     val now = YearMonth.now()
     val months = (5 downTo 0).map { now.minusMonths(it.toLong()) }
+    val records = state.recordsFor(vehicle.id)
+    val fuel = state.fuelFor(vehicle.id)
     val values = months.map { month ->
-        state.recordsFor(vehicle.id)
-            .filter { YearMonth.from(it.date) == month }
-            .sumOf { it.cost }
+        records.filter { YearMonth.from(it.date) == month }.sumOf { it.cost } +
+            fuel.filter { YearMonth.from(it.date) == month }.sumOf { it.totalCost }
     }
     val labels = months.map { monthShort(it) }
     val current = values.lastOrNull() ?: 0.0
@@ -678,7 +939,7 @@ private fun SpendCard(state: AppState, vehicle: Vehicle) {
             SpendBars(values = values, labels = labels)
             Spacer(Modifier.height(14.dp))
             Text(
-                text = "Gasto de los últimos 6 meses",
+                text = "Gasto de los últimos 6 meses · servicios y combustible",
                 style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.5.sp),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

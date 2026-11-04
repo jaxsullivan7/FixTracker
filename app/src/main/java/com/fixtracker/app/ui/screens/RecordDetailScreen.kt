@@ -1,5 +1,6 @@
 package com.fixtracker.app.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,9 +16,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.DeleteOutline
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -30,9 +36,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.fixtracker.app.data.AppState
 import com.fixtracker.app.ui.components.ConfirmDialog
 import com.fixtracker.app.ui.components.FixCard
@@ -41,6 +53,7 @@ import com.fixtracker.app.ui.components.ScreenHeader
 import com.fixtracker.app.ui.components.TypeGlyph
 import com.fixtracker.app.ui.theme.FixTheme
 import com.fixtracker.app.ui.theme.FixTypography
+import com.fixtracker.app.util.AttachmentStore
 import com.fixtracker.app.util.formatDate
 import com.fixtracker.app.util.formatKm
 import com.fixtracker.app.util.formatMoney
@@ -51,6 +64,7 @@ fun RecordDetailScreen(
     state: AppState,
     recordId: String,
     onBack: () -> Unit,
+    onEdit: (String) -> Unit,
     onDelete: (String) -> Unit,
 ) {
     val record = state.records.firstOrNull { it.id == recordId }
@@ -65,7 +79,9 @@ fun RecordDetailScreen(
         return
     }
     val vehicle = state.vehicle(record.vehicleId)
+    val context = LocalContext.current
     var confirmDelete by remember { mutableStateOf(false) }
+    var viewer by remember { mutableStateOf<String?>(null) }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -76,13 +92,23 @@ fun RecordDetailScreen(
                 title = "Detalle del servicio",
                 onBack = onBack,
                 trailing = {
-                    IconButton(onClick = { confirmDelete = true }) {
-                        Icon(
-                            Icons.Outlined.DeleteOutline,
-                            contentDescription = "Eliminar servicio",
-                            tint = FixTheme.palette.danger,
-                            modifier = Modifier.size(20.dp),
-                        )
+                    Row {
+                        IconButton(onClick = { onEdit(record.id) }) {
+                            Icon(
+                                Icons.Outlined.Edit,
+                                contentDescription = "Editar servicio",
+                                tint = MaterialTheme.colorScheme.onSurface,
+                                modifier = Modifier.size(20.dp),
+                            )
+                        }
+                        IconButton(onClick = { confirmDelete = true }) {
+                            Icon(
+                                Icons.Outlined.DeleteOutline,
+                                contentDescription = "Eliminar servicio",
+                                tint = FixTheme.palette.danger,
+                                modifier = Modifier.size(20.dp),
+                            )
+                        }
                     }
                 },
             )
@@ -156,6 +182,47 @@ fun RecordDetailScreen(
             }
         }
 
+        if (record.attachmentNames.isNotEmpty()) {
+            item {
+                Spacer(Modifier.height(24.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "Fotos y facturas",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.weight(1f),
+                    )
+                    Text(
+                        text = "${record.attachmentNames.size}",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                Spacer(Modifier.height(10.dp))
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(record.attachmentNames, key = { it }) { name ->
+                        val bitmap = remember(name) { AttachmentStore.loadBitmap(context, name, 420) }
+                        Box(
+                            modifier = Modifier
+                                .size(96.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(FixTheme.palette.surfaceAlt)
+                                .clickable { viewer = name },
+                        ) {
+                            if (bitmap != null) {
+                                Image(
+                                    bitmap = bitmap.asImageBitmap(),
+                                    contentDescription = "Foto del servicio",
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier.fillMaxSize(),
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         item {
             Spacer(Modifier.height(24.dp))
             FixCard(modifier = Modifier.fillMaxWidth()) {
@@ -205,10 +272,59 @@ fun RecordDetailScreen(
         }
     }
 
+    viewer?.let { name ->
+        Dialog(
+            onDismissRequest = { viewer = null },
+            properties = DialogProperties(usePlatformDefaultWidth = false),
+        ) {
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .background(Color.Black),
+            ) {
+                val bitmap = remember(name) { AttachmentStore.loadBitmap(context, name, 1800) }
+                if (bitmap != null) {
+                    Image(
+                        bitmap = bitmap.asImageBitmap(),
+                        contentDescription = "Foto del servicio",
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                    )
+                } else {
+                    Text(
+                        text = "No se pudo abrir la foto.",
+                        color = Color.White,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.align(Alignment.Center),
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(22.dp)
+                        .size(40.dp)
+                        .clip(CircleShape)
+                        .background(Color.White.copy(alpha = 0.18f))
+                        .clickable { viewer = null },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        Icons.Outlined.Close,
+                        contentDescription = "Cerrar foto",
+                        tint = Color.White,
+                        modifier = Modifier.size(20.dp),
+                    )
+                }
+            }
+        }
+    }
+
     if (confirmDelete) {
         ConfirmDialog(
             title = "¿Eliminar este servicio?",
-            message = "El registro desaparecerá del historial. Esta acción no se puede deshacer.",
+            message = "El registro desaparecerá del historial. Podrás deshacerlo justo después.",
             onConfirm = {
                 confirmDelete = false
                 onDelete(record.id)

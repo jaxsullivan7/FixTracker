@@ -24,6 +24,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.NotificationsNone
+import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -55,6 +56,7 @@ import com.fixtracker.app.ui.components.TypeGlyph
 import com.fixtracker.app.ui.theme.FixTheme
 import com.fixtracker.app.util.daysUntil
 import com.fixtracker.app.util.dueDateLabel
+import com.fixtracker.app.util.formatDateShort
 import com.fixtracker.app.util.formatKm
 import java.time.LocalDate
 import java.util.UUID
@@ -64,15 +66,22 @@ fun RemindersScreen(
     state: AppState,
     onBack: () -> Unit,
     onToggle: (String) -> Unit,
+    onSnooze: (String, LocalDate?) -> Unit,
     onAdd: (Reminder) -> Unit,
 ) {
     var showAdd by remember { mutableStateOf(false) }
+    var snoozeTarget by remember { mutableStateOf<Reminder?>(null) }
+    val today = LocalDate.now()
 
     val active = state.reminders.filterNot { it.done }
     val done = state.reminders.filter { it.done }
-    val overdue = active.filter { isOverdue(it, state) }
-    val soon = active.filter { !isOverdue(it, state) && daysLeft(it) != null && daysLeft(it)!! <= 30 }
-    val later = active.filter { !isOverdue(it, state) && (daysLeft(it) == null || daysLeft(it)!! > 30) }
+    val snoozed = active.filter { it.isSnoozed(today) }
+    val activeNow = active.filterNot { it.isSnoozed(today) }
+    val overdue = activeNow.filter { isOverdue(it, state) }
+    val soon = activeNow.filter { !isOverdue(it, state) && daysLeft(it) != null && daysLeft(it)!! <= 30 }
+    val later = activeNow.filter {
+        !isOverdue(it, state) && (daysLeft(it) == null || daysLeft(it)!! > 30)
+    } + snoozed
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -129,10 +138,10 @@ fun RemindersScreen(
             }
         }
 
-        reminderSection("Vencidos", overdue, state, onToggle)
-        reminderSection("Próximos 30 días", soon, state, onToggle)
-        reminderSection("Más adelante", later, state, onToggle)
-        reminderSection("Completados", done, state, onToggle)
+        reminderSection("Vencidos", overdue, state, onToggle, onSnooze = { snoozeTarget = it })
+        reminderSection("Próximos 30 días", soon, state, onToggle, onSnooze = { snoozeTarget = it })
+        reminderSection("Más adelante", later, state, onToggle, onSnooze = { snoozeTarget = it })
+        reminderSection("Completados", done, state, onToggle, onSnooze = { snoozeTarget = it })
     }
 
     if (showAdd) {
@@ -143,6 +152,68 @@ fun RemindersScreen(
                 onAdd(it)
                 showAdd = false
             },
+        )
+    }
+
+    snoozeTarget?.let { reminder ->
+        AlertDialog(
+            onDismissRequest = { snoozeTarget = null },
+            shape = androidx.compose.foundation.shape.RoundedCornerShape(28.dp),
+            containerColor = MaterialTheme.colorScheme.surface,
+            title = { Text("Posponer aviso", style = MaterialTheme.typography.headlineSmall) },
+            text = {
+                Column {
+                    Text(
+                        text = reminder.title,
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        text = "Dejará de aparecer como urgente hasta la nueva fecha.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Spacer(Modifier.height(14.dp))
+                    SnoozeOption("Una semana") {
+                        onSnooze(reminder.id, today.plusWeeks(1))
+                        snoozeTarget = null
+                    }
+                    SnoozeOption("Un mes") {
+                        onSnooze(reminder.id, today.plusMonths(1))
+                        snoozeTarget = null
+                    }
+                    if (reminder.isSnoozed(today)) {
+                        SnoozeOption("Quitar el aplazamiento") {
+                            onSnooze(reminder.id, null)
+                            snoozeTarget = null
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { snoozeTarget = null }) {
+                    Text("Cerrar", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            },
+        )
+    }
+}
+
+@Composable
+private fun SnoozeOption(label: String, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(androidx.compose.foundation.shape.RoundedCornerShape(14.dp))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 12.dp, vertical = 13.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurface,
         )
     }
 }
@@ -163,6 +234,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.reminderSection(
     itemsList: List<Reminder>,
     state: AppState,
     onToggle: (String) -> Unit,
+    onSnooze: (Reminder) -> Unit,
 ) {
     if (itemsList.isEmpty()) return
     item(key = "section-$title") {
@@ -173,19 +245,23 @@ private fun androidx.compose.foundation.lazy.LazyListScope.reminderSection(
     items(itemsList, key = { it.id }) { reminder ->
         val vehicle = state.vehicle(reminder.vehicleId)
         val overdue = isOverdue(reminder, state)
+        val snoozed = reminder.isSnoozed()
         val palette = FixTheme.palette
         val chipColor = when {
             reminder.done -> MaterialTheme.colorScheme.onSurfaceVariant
+            snoozed -> palette.blue
             overdue -> palette.danger
             else -> palette.copper
         }
         val chipBg = when {
             reminder.done -> palette.surfaceAlt
+            snoozed -> palette.surfaceAlt
             overdue -> palette.dangerSoft
             else -> palette.copperSoft
         }
         val chipText = when {
             reminder.done -> "Completado"
+            snoozed -> "Pospuesto"
             overdue -> "Vencido"
             reminder.dueDate != null -> dueDateLabel(reminder.dueDate)
             else -> "Pendiente"
@@ -220,6 +296,12 @@ private fun androidx.compose.foundation.lazy.LazyListScope.reminderSection(
                             if (isNotEmpty()) append("  ·  ")
                             append("${formatKm(it)} km")
                         }
+                        if (snoozed) {
+                            reminder.snoozedUntil?.let {
+                                if (isNotEmpty()) append("  ·  ")
+                                append("hasta ${formatDateShort(it)}")
+                            }
+                        }
                     },
                     style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -230,6 +312,24 @@ private fun androidx.compose.foundation.lazy.LazyListScope.reminderSection(
                 StatusChip(text = chipText, color = chipColor, background = chipBg)
             }
             Spacer(Modifier.width(10.dp))
+            if (!reminder.done) {
+                Box(
+                    modifier = Modifier
+                        .size(28.dp)
+                        .clip(CircleShape)
+                        .background(FixTheme.palette.surfaceAlt)
+                        .clickable { onSnooze(reminder) },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        Icons.Outlined.Schedule,
+                        contentDescription = "Posponer aviso",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(15.dp),
+                    )
+                }
+                Spacer(Modifier.width(6.dp))
+            }
             Box(
                 modifier = Modifier
                     .size(28.dp)

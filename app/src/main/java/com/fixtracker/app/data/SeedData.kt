@@ -17,8 +17,10 @@ object SeedData {
             colorName = "Grigio Silverstone",
             itvUntil = today.plusDays(16),
             insuranceUntil = today.plusDays(47),
+            roadTaxUntil = today.plusDays(70),
             nextServiceKm = 107_000,
             nextServiceDate = today.plusDays(24),
+            kmUpdatedAt = today.minusDays(2),
         )
         val vespa = Vehicle(
             id = "veh-vespa",
@@ -32,8 +34,10 @@ object SeedData {
             colorName = "Verde Oliva",
             itvUntil = today.plusDays(120),
             insuranceUntil = today.plusDays(210),
+            roadTaxUntil = today.plusDays(160),
             nextServiceKm = 16_900,
             nextServiceDate = today.plusDays(75),
+            kmUpdatedAt = today.minusDays(6),
         )
 
         fun daysAgo(days: Long): LocalDate = today.minusDays(days)
@@ -133,6 +137,10 @@ object SeedData {
                 note = "Póliza a todo riesgo con Mapfre.",
             ),
             Reminder(
+                id = "tax-${alfa.id}", vehicleId = alfa.id, title = "Impuesto de circulación",
+                type = ServiceType.OTRO, dueDate = today.plusDays(70),
+            ),
+            Reminder(
                 id = "tires-${alfa.id}", vehicleId = alfa.id, title = "Neumáticos traseros",
                 type = ServiceType.NEUMATICOS, dueKm = 99_000,
                 note = "Revisar desgaste en el próximo cambio de aceite.",
@@ -149,6 +157,53 @@ object SeedData {
                 id = "insurance-${vespa.id}", vehicleId = vespa.id, title = "Renovación de seguro",
                 type = ServiceType.SEGURO, dueDate = today.plusDays(210),
             ),
+            Reminder(
+                id = "tax-${vespa.id}", vehicleId = vespa.id, title = "Impuesto de circulación",
+                type = ServiceType.OTRO, dueDate = today.plusDays(160),
+            ),
+        )
+
+        val fuelEntries = listOf(
+            FuelEntry(
+                id = "fuel-alfa-1", vehicleId = alfa.id, date = today.minusDays(5),
+                km = 96_100, liters = 42.5, totalCost = 61.63, station = "Repsol",
+            ),
+            FuelEntry(
+                id = "fuel-alfa-2", vehicleId = alfa.id, date = today.minusDays(20),
+                km = 95_300, liters = 45.2, totalCost = 65.54, station = "Cepsa",
+            ),
+            FuelEntry(
+                id = "fuel-alfa-3", vehicleId = alfa.id, date = today.minusDays(35),
+                km = 94_500, liters = 48.0, totalCost = 69.60, station = "Repsol",
+            ),
+            FuelEntry(
+                id = "fuel-alfa-4", vehicleId = alfa.id, date = today.minusDays(50),
+                km = 93_700, liters = 43.5, totalCost = 63.08, station = "BP",
+            ),
+            FuelEntry(
+                id = "fuel-alfa-5", vehicleId = alfa.id, date = today.minusDays(70),
+                km = 92_900, liters = 46.0, totalCost = 66.70, station = "Repsol",
+            ),
+            FuelEntry(
+                id = "fuel-alfa-6", vehicleId = alfa.id, date = today.minusDays(90),
+                km = 92_100, liters = 44.0, totalCost = 63.80, station = "Cepsa",
+            ),
+            FuelEntry(
+                id = "fuel-vespa-1", vehicleId = vespa.id, date = today.minusDays(10),
+                km = 12_800, liters = 7.2, totalCost = 11.52, station = "Repsol",
+            ),
+            FuelEntry(
+                id = "fuel-vespa-2", vehicleId = vespa.id, date = today.minusDays(25),
+                km = 12_600, liters = 6.8, totalCost = 10.88, station = "Cepsa",
+            ),
+            FuelEntry(
+                id = "fuel-vespa-3", vehicleId = vespa.id, date = today.minusDays(55),
+                km = 12_400, liters = 7.0, totalCost = 11.20, station = "Repsol",
+            ),
+            FuelEntry(
+                id = "fuel-vespa-4", vehicleId = vespa.id, date = today.minusDays(80),
+                km = 12_200, liters = 6.5, totalCost = 10.40, station = "BP",
+            ),
         )
 
         return AppState(
@@ -156,6 +211,7 @@ object SeedData {
             activeVehicleId = alfa.id,
             vehicles = listOf(alfa, vespa),
             records = records,
+            fuelEntries = fuelEntries,
             reminders = reminders,
         )
     }

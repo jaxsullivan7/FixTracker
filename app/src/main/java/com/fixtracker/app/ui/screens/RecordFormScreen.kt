@@ -1,8 +1,14 @@
 package com.fixtracker.app.ui.screens
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -16,10 +22,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AddAPhoto
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -27,10 +36,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -47,7 +60,11 @@ import com.fixtracker.app.ui.components.ScreenHeader
 import com.fixtracker.app.ui.components.serviceColor
 import com.fixtracker.app.ui.components.serviceIcon
 import com.fixtracker.app.ui.theme.FixTheme
+import com.fixtracker.app.util.AttachmentStore
 import com.fixtracker.app.util.formatKm
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.util.UUID
 
@@ -55,21 +72,38 @@ import java.util.UUID
 fun RecordFormScreen(
     state: AppState,
     initialVehicleId: String?,
+    editingRecordId: String? = null,
+    initialType: ServiceType? = null,
     onClose: () -> Unit,
     onSave: (ServiceRecord) -> Unit,
 ) {
-    val defaultVehicle = state.vehicle(initialVehicleId ?: state.activeVehicleId) ?: state.activeVehicle
-    var vehicleId by remember {
+    val existing = editingRecordId?.let { id -> state.records.firstOrNull { it.id == id } }
+    val defaultVehicle = state.vehicle(existing?.vehicleId ?: initialVehicleId ?: state.activeVehicleId)
+        ?: state.activeVehicle
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    var vehicleId by remember(existing?.id) {
         mutableStateOf(defaultVehicle?.id ?: state.vehicles.firstOrNull()?.id.orEmpty())
     }
     val vehicle = state.vehicle(vehicleId)
-    var type by remember { mutableStateOf(ServiceType.ACEITE) }
-    var title by remember { mutableStateOf(ServiceType.ACEITE.label) }
-    var date by remember { mutableStateOf(LocalDate.now()) }
-    var km by remember { mutableStateOf(vehicle?.km?.toString().orEmpty()) }
-    var cost by remember { mutableStateOf("") }
-    var shop by remember { mutableStateOf("") }
-    var notes by remember { mutableStateOf("") }
+    var type by remember(existing?.id) { mutableStateOf(existing?.type ?: initialType ?: ServiceType.ACEITE) }
+    var title by remember(existing?.id) {
+        mutableStateOf(existing?.title ?: (initialType ?: ServiceType.ACEITE).label)
+    }
+    var date by remember(existing?.id) { mutableStateOf(existing?.date ?: LocalDate.now()) }
+    var km by remember(existing?.id) {
+        mutableStateOf(existing?.km?.toString() ?: vehicle?.km?.toString().orEmpty())
+    }
+    var cost by remember(existing?.id) {
+        mutableStateOf(existing?.cost?.let { formatCostInput(it) }.orEmpty())
+    }
+    var shop by remember(existing?.id) { mutableStateOf(existing?.shop.orEmpty()) }
+    var notes by remember(existing?.id) { mutableStateOf(existing?.notes.orEmpty()) }
+    var attachments by remember(existing?.id) {
+        mutableStateOf(existing?.attachmentNames ?: emptyList())
+    }
+    var savingPhotos by remember { mutableStateOf(false) }
 
     val canSave = vehicle != null && (km.toIntOrNull() ?: -1) >= 0
 
@@ -80,13 +114,30 @@ fun RecordFormScreen(
         type = next
     }
 
+    val photoPicker = rememberLauncherForActivityResult(
+        ActivityResultContracts.PickMultipleVisualMedia(3)
+    ) { uris: List<Uri> ->
+        if (uris.isEmpty()) return@rememberLauncherForActivityResult
+        scope.launch {
+            savingPhotos = true
+            val available = (3 - attachments.size).coerceAtLeast(0)
+            val names = runCatching {
+                withContext(Dispatchers.IO) {
+                    uris.take(available).mapNotNull { AttachmentStore.saveImage(context, it) }
+                }
+            }.getOrDefault(emptyList())
+            attachments = (attachments + names).take(3)
+            savingPhotos = false
+        }
+    }
+
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 4.dp, bottom = 30.dp),
     ) {
         item {
             ScreenHeader(
-                title = "Nuevo servicio",
+                title = if (existing == null) "Nuevo servicio" else "Editar servicio",
                 onBack = onClose,
             )
         }
@@ -94,13 +145,17 @@ fun RecordFormScreen(
         item {
             Spacer(Modifier.height(16.dp))
             Text(
-                text = "Registra el mantenimiento",
+                text = if (existing == null) "Registra el mantenimiento" else "Corrige el servicio",
                 style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.onBackground,
             )
             Spacer(Modifier.height(6.dp))
             Text(
-                text = "Añade los detalles y FixTracker actualizará el historial y los próximos avisos.",
+                text = if (existing == null) {
+                    "Añade los detalles y FixTracker actualizará el historial y los próximos avisos."
+                } else {
+                    "Los cambios se reflejarán en el historial y en los avisos del vehículo."
+                },
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -119,7 +174,7 @@ fun RecordFormScreen(
                             onClick = {
                                 if (v.id != vehicleId) {
                                     vehicleId = v.id
-                                    km = v.km.toString()
+                                    if (existing == null) km = v.km.toString()
                                 }
                             },
                         )
@@ -217,6 +272,66 @@ fun RecordFormScreen(
         }
 
         item {
+            Spacer(Modifier.height(24.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Label("FOTOS Y FACTURAS")
+                Spacer(Modifier.weight(1f))
+                Text(
+                    text = "${attachments.size}/3",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Spacer(Modifier.height(9.dp))
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                items(attachments, key = { it }) { name ->
+                    AttachmentThumb(
+                        context = context,
+                        name = name,
+                        onRemove = { attachments = attachments - name },
+                    )
+                }
+                if (attachments.size < 3) {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .size(82.dp)
+                                .clip(RoundedCornerShape(14.dp))
+                                .background(FixTheme.palette.surfaceAlt)
+                                .clickable {
+                                    photoPicker.launch(
+                                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                    )
+                                },
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            if (savingPhotos) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(20.dp),
+                                    strokeWidth = 2.dp,
+                                    color = MaterialTheme.colorScheme.primary,
+                                )
+                            } else {
+                                Icon(
+                                    Icons.Outlined.AddAPhoto,
+                                    contentDescription = "Añadir foto",
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.size(22.dp),
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+            Spacer(Modifier.height(7.dp))
+            Text(
+                text = "Hasta 3 fotos de la factura o del recambio. Se guardan solo en este dispositivo.",
+                style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+
+        item {
             Spacer(Modifier.height(12.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
@@ -242,13 +357,13 @@ fun RecordFormScreen(
         item {
             Spacer(Modifier.height(24.dp))
             PrimaryButton(
-                text = "Guardar servicio",
-                enabled = canSave,
+                text = if (existing == null) "Guardar servicio" else "Guardar cambios",
+                enabled = canSave && !savingPhotos,
                 onClick = {
                     val current = state.vehicle(vehicleId) ?: return@PrimaryButton
                     onSave(
                         ServiceRecord(
-                            id = UUID.randomUUID().toString(),
+                            id = existing?.id ?: UUID.randomUUID().toString(),
                             vehicleId = current.id,
                             type = type,
                             title = title.ifBlank { type.label },
@@ -257,6 +372,7 @@ fun RecordFormScreen(
                             cost = cost.replace(',', '.').toDoubleOrNull() ?: 0.0,
                             shop = shop.trim(),
                             notes = notes.trim(),
+                            attachmentNames = attachments,
                         )
                     )
                 },
@@ -270,6 +386,47 @@ fun RecordFormScreen(
                     modifier = Modifier.fillMaxWidth(),
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun AttachmentThumb(
+    context: android.content.Context,
+    name: String,
+    onRemove: () -> Unit,
+) {
+    val bitmap = remember(name) { AttachmentStore.loadBitmap(context, name, 320) }
+    Box(
+        modifier = Modifier
+            .size(82.dp)
+            .clip(RoundedCornerShape(14.dp))
+            .background(FixTheme.palette.surfaceAlt),
+    ) {
+        if (bitmap != null) {
+            Image(
+                bitmap = bitmap.asImageBitmap(),
+                contentDescription = "Foto adjunta",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize(),
+            )
+        }
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(5.dp)
+                .size(22.dp)
+                .clip(CircleShape)
+                .background(androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.55f))
+                .clickable(onClick = onRemove),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                Icons.Outlined.Close,
+                contentDescription = "Quitar foto",
+                tint = androidx.compose.ui.graphics.Color.White,
+                modifier = Modifier.size(14.dp),
+            )
         }
     }
 }
@@ -311,3 +468,7 @@ private fun TypeChip(
         )
     }
 }
+
+private fun formatCostInput(value: Double): String =
+    if (value % 1.0 == 0.0) value.toInt().toString()
+    else String.format(java.util.Locale.US, "%.2f", value).replace('.', ',')

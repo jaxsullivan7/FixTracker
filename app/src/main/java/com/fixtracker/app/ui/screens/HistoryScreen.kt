@@ -86,7 +86,7 @@ fun HistoryScreen(
             )
             Spacer(Modifier.height(4.dp))
             Text(
-                text = "${allRecords.size} servicios  ·  ${formatMoney(state.records.sumOf { it.cost }, state.settings.currency)} invertidos",
+                text = "${allRecords.size} servicios  ·  ${formatMoney(state.records.sumOf { it.cost }, state.settings.currency)} en servicios",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

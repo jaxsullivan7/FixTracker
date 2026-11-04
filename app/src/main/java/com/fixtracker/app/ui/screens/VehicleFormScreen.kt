@@ -72,6 +72,7 @@ fun VehicleFormScreen(
     var colorName by remember(existing?.id) { mutableStateOf(existing?.colorName.orEmpty()) }
     var itv by remember(existing?.id) { mutableStateOf(existing?.itvUntil) }
     var insurance by remember(existing?.id) { mutableStateOf(existing?.insuranceUntil) }
+    var roadTax by remember(existing?.id) { mutableStateOf(existing?.roadTaxUntil) }
     var fuelDialog by remember { mutableStateOf(false) }
 
     val canSave = brand.isNotBlank() && model.isNotBlank()
@@ -209,6 +210,11 @@ fun VehicleFormScreen(
                     date = insurance,
                     onDateSelected = { insurance = it },
                 )
+                DateField(
+                    label = "Impuesto de circulación",
+                    date = roadTax,
+                    onDateSelected = { roadTax = it },
+                )
             }
         }
 
@@ -218,6 +224,7 @@ fun VehicleFormScreen(
                 text = if (existing == null) "Añadir vehículo" else "Guardar cambios",
                 enabled = canSave,
                 onClick = {
+                    val kmValue = km.toIntOrNull() ?: existing?.km ?: 0
                     onSave(
                         Vehicle(
                             id = existing?.id ?: UUID.randomUUID().toString(),
@@ -225,14 +232,20 @@ fun VehicleFormScreen(
                             model = model.trim(),
                             plate = plate.trim(),
                             year = year.toIntOrNull() ?: LocalDate.now().year,
-                            km = km.toIntOrNull() ?: 0,
+                            km = kmValue,
                             fuel = fuel,
                             type = type,
                             colorName = colorName.trim(),
                             itvUntil = itv,
                             insuranceUntil = insurance,
+                            roadTaxUntil = roadTax,
                             nextServiceKm = existing?.nextServiceKm,
                             nextServiceDate = existing?.nextServiceDate,
+                            kmUpdatedAt = when {
+                                existing == null -> LocalDate.now()
+                                existing.km == kmValue -> existing.kmUpdatedAt
+                                else -> LocalDate.now()
+                            },
                         )
                     )
                 },

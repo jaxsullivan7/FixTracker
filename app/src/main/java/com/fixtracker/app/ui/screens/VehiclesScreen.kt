@@ -38,7 +38,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.fixtracker.app.data.AppState
+import com.fixtracker.app.data.HealthStatus
 import com.fixtracker.app.data.Vehicle
+import com.fixtracker.app.data.healthFor
 import com.fixtracker.app.ui.components.EmptyState
 import com.fixtracker.app.ui.components.StatusChip
 import com.fixtracker.app.ui.components.ThinProgress
@@ -119,6 +121,7 @@ fun VehiclesScreen(
             VehicleCard(
                 vehicle = vehicle,
                 isActive = vehicle.id == state.activeVehicleId,
+                health = state.healthFor(vehicle.id),
                 totalSpend = state.spendFor(vehicle.id),
                 currency = state.settings.currency,
                 onClick = { onOpenVehicle(vehicle.id) },
@@ -145,6 +148,7 @@ fun VehiclesScreen(
 private fun VehicleCard(
     vehicle: Vehicle,
     isActive: Boolean,
+    health: HealthStatus,
     totalSpend: Double,
     currency: String,
     onClick: () -> Unit,
@@ -156,6 +160,21 @@ private fun VehicleCard(
     val serviceProgress = kmLeft?.let {
         1f - (it.toFloat() / vehicle.serviceKmInterval).coerceIn(0f, 1f)
     } ?: 0f
+    val healthLabel = when (health) {
+        HealthStatus.OVERDUE -> "Vencido"
+        HealthStatus.SOON -> "Próximo"
+        HealthStatus.OK -> "Al día"
+    }
+    val healthColor = when (health) {
+        HealthStatus.OVERDUE -> palette.danger
+        HealthStatus.SOON -> palette.copper
+        HealthStatus.OK -> palette.positive
+    }
+    val healthBg = when (health) {
+        HealthStatus.OVERDUE -> palette.dangerSoft
+        HealthStatus.SOON -> palette.copperSoft
+        HealthStatus.OK -> palette.positiveSoft
+    }
 
     Column(
         modifier = Modifier
@@ -223,7 +242,18 @@ private fun VehicleCard(
             }
         }
 
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(10.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            StatusChip(text = healthLabel, color = healthColor, background = healthBg)
+            Spacer(Modifier.width(7.dp))
+            Text(
+                text = if (isActive) "Vehículo activo" else "Toca para ver la ficha",
+                style = MaterialTheme.typography.bodySmall.copy(fontSize = 10.5.sp),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+
+        Spacer(Modifier.height(14.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Metric(
                 label = "Kilometraje",
@@ -236,7 +266,7 @@ private fun VehicleCard(
                 modifier = Modifier.weight(1f),
             )
             Metric(
-                label = "Invertido",
+                label = "Gasto total",
                 value = formatMoney(totalSpend, currency),
                 modifier = Modifier.weight(1f),
             )
