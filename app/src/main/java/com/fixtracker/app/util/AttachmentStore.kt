@@ -19,7 +19,8 @@ object AttachmentStore {
     fun directory(context: Context): File =
         File(context.filesDir, "attachments").apply { mkdirs() }
 
-    fun file(context: Context, name: String): File = File(directory(context), name)
+    fun file(context: Context, name: String): File =
+        File(directory(context), File(name).name)
 
     fun saveImage(context: Context, uri: Uri): String? {
         val bitmap = decodeSampled(context, uri, MAX_DIMENSION) ?: return null

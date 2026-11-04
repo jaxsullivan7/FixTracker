@@ -112,6 +112,9 @@ fun HomeScreen(
             }
     }.orEmpty()
     val records = vehicle?.let { state.recordsFor(it.id) }.orEmpty()
+    val snoozedCount = vehicle?.let { v ->
+        state.remindersFor(v.id).count { it.isSnoozed() }
+    } ?: 0
     var showKmDialog by remember { mutableStateOf(false) }
     var showSwitcher by remember { mutableStateOf(false) }
     val health = vehicle?.let { state.healthFor(it.id) }
@@ -265,8 +268,12 @@ fun HomeScreen(
                 item {
                     EmptyState(
                         icon = Icons.Outlined.NotificationsNone,
-                        title = "Nada pendiente",
-                        message = "No tienes avisos para este vehículo.",
+                        title = if (snoozedCount > 0) "Avisos pospuestos" else "Nada pendiente",
+                        message = if (snoozedCount > 0) {
+                            "Los has pospuesto para más adelante. Puedes verlos en Recordatorios."
+                        } else {
+                            "No tienes avisos para este vehículo."
+                        },
                     )
                 }
             } else {

@@ -67,7 +67,7 @@
           "points": 5,
           "status": "todo",
           "jiraKey": "FIX-14",
-          "jiraStatus": "To Do"
+          "jiraStatus": "Done"
         }
       ],
       "jiraKey": "FIX-1"
@@ -126,7 +126,7 @@
           "points": 5,
           "status": "todo",
           "jiraKey": "FIX-19",
-          "jiraStatus": "To Do"
+          "jiraStatus": "Done"
         },
         {
           "id": "FIX-206",
@@ -146,7 +146,7 @@
           "points": 8,
           "status": "todo",
           "jiraKey": "FIX-21",
-          "jiraStatus": "To Do"
+          "jiraStatus": "Done"
         },
         {
           "id": "FIX-208",
@@ -156,7 +156,7 @@
           "points": 3,
           "status": "todo",
           "jiraKey": "FIX-22",
-          "jiraStatus": "To Do"
+          "jiraStatus": "Done"
         }
       ],
       "jiraKey": "FIX-2"
@@ -195,7 +195,7 @@
           "points": 8,
           "status": "todo",
           "jiraKey": "FIX-25",
-          "jiraStatus": "To Do"
+          "jiraStatus": "Done"
         },
         {
           "id": "FIX-304",
@@ -215,7 +215,7 @@
           "points": 2,
           "status": "todo",
           "jiraKey": "FIX-27",
-          "jiraStatus": "To Do"
+          "jiraStatus": "Done"
         },
         {
           "id": "FIX-306",
@@ -274,7 +274,7 @@
           "points": 5,
           "status": "todo",
           "jiraKey": "FIX-32",
-          "jiraStatus": "To Do"
+          "jiraStatus": "Done"
         },
         {
           "id": "FIX-405",
@@ -284,7 +284,7 @@
           "points": 5,
           "status": "todo",
           "jiraKey": "FIX-33",
-          "jiraStatus": "To Do"
+          "jiraStatus": "Done"
         }
       ],
       "jiraKey": "FIX-4"
@@ -333,7 +333,7 @@
           "points": 5,
           "status": "todo",
           "jiraKey": "FIX-37",
-          "jiraStatus": "To Do"
+          "jiraStatus": "Done"
         }
       ],
       "jiraKey": "FIX-5"
@@ -382,7 +382,7 @@
           "points": 3,
           "status": "todo",
           "jiraKey": "FIX-41",
-          "jiraStatus": "To Do"
+          "jiraStatus": "Done"
         },
         {
           "id": "FIX-605",
@@ -441,7 +441,7 @@
           "points": 5,
           "status": "todo",
           "jiraKey": "FIX-46",
-          "jiraStatus": "To Do"
+          "jiraStatus": "Done"
         },
         {
           "id": "FIX-704",
@@ -451,7 +451,7 @@
           "points": 5,
           "status": "todo",
           "jiraKey": "FIX-47",
-          "jiraStatus": "To Do"
+          "jiraStatus": "Done"
         },
         {
           "id": "FIX-705",
@@ -471,7 +471,7 @@
           "points": 3,
           "status": "partial",
           "jiraKey": "FIX-49",
-          "jiraStatus": "In Progress"
+          "jiraStatus": "Done"
         }
       ],
       "jiraKey": "FIX-7"
@@ -500,7 +500,7 @@
           "points": 8,
           "status": "todo",
           "jiraKey": "FIX-51",
-          "jiraStatus": "To Do"
+          "jiraStatus": "In Progress"
         },
         {
           "id": "FIX-803",
@@ -552,6 +552,17 @@
     "task": {
       "key": "FIX-55",
       "summary": "Revisión visual del boceto 0.1.0"
+    },
+    "localVersion": "0.2.0",
+    "jiraSyncPending": true,
+    "note": "Estado local v0.2.0; la sesión de Jira caducó. Ver docs/JIRA_UPDATE_v0.2.md para aplicar los cambios.",
+    "countsNote": "Conteo de la importación inicial (v0.1.0); ver localCounts para el estado v0.2.0.",
+    "localCounts": {
+      "storiesMapped": 46,
+      "newStories": 7,
+      "done": 33,
+      "inProgress": 4,
+      "toDo": 9
     }
   }
 }

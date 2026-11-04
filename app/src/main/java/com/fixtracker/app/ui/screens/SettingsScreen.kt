@@ -440,7 +440,7 @@ fun SettingsScreen(
             }
             Spacer(Modifier.height(8.dp))
             Text(
-                text = "Cada cambio guarda una copia local automática. Las fotos y los documentos se incluyen en la copia ZIP.",
+                text = "Cada cambio guarda una copia local automática. Las fotos de facturas se incluyen en la copia ZIP.",
                 style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
